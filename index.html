@@ -64,7 +64,7 @@
       top:14px;
       left:50%;
       transform: translateX(-50%);
-      z-index:5;
+      z-index:6;
       display:flex;
       align-items:center;
       gap:10px;
@@ -90,10 +90,15 @@
       transition: width .25s ease;
     }
 
-    /* Title */
-    .hero{
-      width:min(980px, 100%);
+    /* Prevent HUD overlap on fullscreen race page */
+    body.inRace .raceTop{ margin-top: 62px; }
+    body.inRace .hud{ left: 14px; transform:none; }
+    @media (max-width: 700px){
+      body.inRace .raceTop{ margin-top: 74px; }
     }
+
+    /* Title */
+    .hero{ width:min(980px, 100%); }
     .kicker{
       color:var(--muted);
       text-transform:uppercase;
@@ -348,6 +353,7 @@
       background: rgba(0,0,0,.45);
       backdrop-filter: blur(10px);
       z-index:3;
+      flex-wrap:wrap;
     }
     .raceTop .brand{
       display:flex;
@@ -368,7 +374,7 @@
       white-space: nowrap;
       overflow:hidden;
       text-overflow: ellipsis;
-      max-width: 52ch;
+      max-width: 60ch;
     }
     .raceControls{
       display:flex;
@@ -410,6 +416,16 @@
         linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.0));
     }
 
+    /* Decorative scene background (grayscale) */
+    .sceneBg{
+      position:absolute;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      opacity:.95;
+    }
+    .sceneBg svg{ width:100%; height:100%; display:block; }
+
     /* spectators */
     .stands{
       position:absolute;
@@ -420,6 +436,7 @@
         linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,0)),
         repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 2px, rgba(0,0,0,0) 2px 10px);
       overflow:hidden;
+      z-index:1;
     }
     .crowd{
       position:absolute;
@@ -450,6 +467,8 @@
       background:
         linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)),
         radial-gradient(120% 90% at 50% 80%, rgba(0,0,0,.55), rgba(0,0,0,0) 60%);
+      z-index:1;
+      overflow:hidden;
     }
     .lanes{
       position:absolute;
@@ -486,6 +505,28 @@
       );
       opacity:.40;
     }
+
+    /* hyper mode: fast multi-run */
+    .track.hyper:before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 14px, rgba(0,0,0,0) 14px 38px);
+      opacity:.55;
+      animation: hyperStreak 260ms linear infinite;
+      pointer-events:none;
+    }
+    @keyframes hyperStreak{
+      0%{ transform: translateX(0); }
+      100%{ transform: translateX(-38px); }
+    }
+    .track.hyper .horse{ filter: blur(.35px); }
+    .track.hyper .horse.run .body{ animation-duration: 90ms; }
+    .track.hyper .horse.run .head{ animation-duration: 90ms; }
+    .track.hyper .horse.run .legA{ animation-duration: 70ms; }
+    .track.hyper .horse.run .legB{ animation-duration: 70ms; }
+    .track.hyper .horse.run .tail{ animation-duration: 100ms; }
+    .track.hyper .horse.run + .dust i{ animation-duration: 220ms; }
 
     /* bookie booth */
     .bookieBooth{
@@ -553,8 +594,8 @@
     .horse{
       position:absolute;
       left: 18px;
-      width: 210px;
-      height: 70px;
+      width: 240px;
+      height: 78px;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -590,8 +631,8 @@
       color: rgba(255,255,255,.80);
     }
     .horse svg{
-      width: 86px;
-      height: 44px;
+      width: 100px;
+      height: 52px;
       overflow: visible;
     }
 
@@ -613,16 +654,16 @@
     /* dust */
     .dust{
       position:absolute;
-      width: 160px; height: 80px;
+      width: 200px; height: 90px;
       left: 0;
       pointer-events:none;
       opacity:0;
-      z-index:0;
+      z-index:1;
     }
     .dust i{
       position:absolute;
       bottom: 12px;
-      width: 8px; height: 8px;
+      width: 9px; height: 9px;
       border-radius:999px;
       background: rgba(255,255,255,.12);
       animation: dust 420ms infinite ease-out;
@@ -631,7 +672,6 @@
       0%{ transform: translateX(0) translateY(0) scale(0.9); opacity:.35; }
       100%{ transform: translateX(-36px) translateY(-14px) scale(1.3); opacity:0; }
     }
-
     .horse.run + .dust{ opacity:1; }
 
     /* money particles */
@@ -691,7 +731,7 @@
     }
     .raceBottom strong{ color: rgba(255,255,255,.92); }
 
-    /* colored horses only (rest stays b/w) */
+    /* colored horses only */
     .c1{ --hc:#ff4d4d; }
     .c2{ --hc:#4dd2ff; }
     .c3{ --hc:#ffe14d; }
@@ -702,6 +742,34 @@
     .horse .sil2{ fill: color-mix(in srgb, var(--hc) 55%, black 45%); opacity:.9; }
     .horse .stroke{ stroke: rgba(255,255,255,.24); }
 
+    /* ---- Sound control ---- */
+    .soundBtn{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      color: rgba(255,255,255,.90);
+      cursor:pointer;
+      font-family: var(--mono);
+      font-size: 12px;
+      user-select:none;
+    }
+    .soundBtn:hover{ background: rgba(255,255,255,.08); }
+    .soundDot{
+      width:8px; height:8px; border-radius:999px;
+      background: rgba(255,255,255,.45);
+      box-shadow: 0 0 0 5px rgba(255,255,255,.08);
+    }
+    .soundBtn.on .soundDot{ background: rgba(255,255,255,.90); }
+
+    /* respect reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      *{ animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; scroll-behavior:auto !important; }
+      .track.hyper:before{ display:none !important; }
+    }
   </style>
 </head>
 
@@ -729,7 +797,7 @@
         <div class="scrollHint"><i></i> scroll</div>
       </section>
 
-      <!-- PAGE 2: Inputs (all together) -->
+      <!-- PAGE 2: Inputs -->
       <section data-page="2">
         <div class="wrap">
           <div class="card">
@@ -832,7 +900,6 @@
 
               <div class="note" style="font-family:var(--mono)" id="topRisk">—</div>
 
-              <!-- EXPLANATIONS BELOW (as requested) -->
               <div class="note" id="explainBlock">
                 <b style="color:rgba(255,255,255,.78); font-family:var(--mono); letter-spacing:.10em; text-transform:uppercase; font-size:11px;">How this works</b><br/><br/>
                 <span style="color:rgba(255,255,255,.62)">
@@ -856,6 +923,10 @@
             </div>
 
             <div class="raceControls">
+              <button class="soundBtn" id="soundBtn" type="button" title="Toggle sound">
+                <span class="soundDot"></span><span id="soundLabel">Sound OFF</span>
+              </button>
+
               <select id="pickHorse">
                 <option value="0">Pick: Horse 1</option>
                 <option value="1">Pick: Horse 2</option>
@@ -872,14 +943,56 @@
                 <option value="1.20">Overround 120%</option>
               </select>
 
-              <button class="btn" id="raceBtn">Run 1 race</button>
-              <button class="btn" id="sim1kBtn">Run 1,000</button>
-              <button class="btn" id="sim10kBtn">Run 10,000</button>
-              <button class="btn" id="resetBankBtn">Reset</button>
+              <button class="btn" id="raceBtn" type="button">Run 1</button>
+
+              <input id="raceCount" type="number" min="1" step="1" value="250" title="Number of races" />
+              <button class="btn" id="runCustomBtn" type="button">Run N</button>
+
+              <button class="btn" id="resetBankBtn" type="button">Reset</button>
             </div>
           </div>
 
           <div class="raceBody" id="raceBody">
+            <!-- Decorative scene -->
+            <div class="sceneBg" aria-hidden="true">
+              <svg viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid slice">
+                <rect x="0" y="0" width="1200" height="260" fill="rgba(255,255,255,.06)"/>
+                <g opacity=".45" fill="rgba(255,255,255,.22)">
+                  <ellipse cx="160" cy="90" rx="60" ry="22"/><ellipse cx="210" cy="90" rx="40" ry="18"/><ellipse cx="120" cy="95" rx="44" ry="18"/>
+                  <ellipse cx="860" cy="70" rx="70" ry="24"/><ellipse cx="920" cy="72" rx="46" ry="18"/><ellipse cx="810" cy="74" rx="44" ry="18"/>
+                </g>
+                <path d="M0,240 C240,170 380,210 520,200 C700,188 820,140 1200,205 L1200,320 L0,320 Z"
+                  fill="rgba(255,255,255,.05)"/>
+                <path d="M0,255 C260,210 420,250 580,238 C760,224 900,190 1200,240 L1200,340 L0,340 Z"
+                  fill="rgba(255,255,255,.035)"/>
+                <g opacity=".9">
+                  <rect x="90" y="130" width="250" height="110" rx="14" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.10)"/>
+                  <rect x="870" y="130" width="250" height="110" rx="14" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.10)"/>
+                  <g fill="rgba(255,255,255,.12)">
+                    <!-- seats dots -->
+                    <circle cx="120" cy="175" r="5"/><circle cx="142" cy="175" r="5"/><circle cx="164" cy="175" r="5"/><circle cx="186" cy="175" r="5"/><circle cx="208" cy="175" r="5"/><circle cx="230" cy="175" r="5"/><circle cx="252" cy="175" r="5"/><circle cx="274" cy="175" r="5"/><circle cx="296" cy="175" r="5"/><circle cx="318" cy="175" r="5"/>
+                    <circle cx="120" cy="205" r="5"/><circle cx="142" cy="205" r="5"/><circle cx="164" cy="205" r="5"/><circle cx="186" cy="205" r="5"/><circle cx="208" cy="205" r="5"/><circle cx="230" cy="205" r="5"/><circle cx="252" cy="205" r="5"/><circle cx="274" cy="205" r="5"/><circle cx="296" cy="205" r="5"/><circle cx="318" cy="205" r="5"/>
+                    <circle cx="900" cy="175" r="5"/><circle cx="922" cy="175" r="5"/><circle cx="944" cy="175" r="5"/><circle cx="966" cy="175" r="5"/><circle cx="988" cy="175" r="5"/><circle cx="1010" cy="175" r="5"/><circle cx="1032" cy="175" r="5"/><circle cx="1054" cy="175" r="5"/><circle cx="1076" cy="175" r="5"/><circle cx="1098" cy="175" r="5"/>
+                    <circle cx="900" cy="205" r="5"/><circle cx="922" cy="205" r="5"/><circle cx="944" cy="205" r="5"/><circle cx="966" cy="205" r="5"/><circle cx="988" cy="205" r="5"/><circle cx="1010" cy="205" r="5"/><circle cx="1032" cy="205" r="5"/><circle cx="1054" cy="205" r="5"/><circle cx="1076" cy="205" r="5"/><circle cx="1098" cy="205" r="5"/>
+                  </g>
+                  <g stroke="rgba(255,255,255,.12)">
+                    <line x1="120" y1="120" x2="120" y2="145"/><line x1="1040" y1="120" x2="1040" y2="145"/>
+                  </g>
+                  <g fill="rgba(255,255,255,.18)">
+                    <path d="M120 122 L150 130 L120 138 Z"/><path d="M1040 122 L1070 130 L1040 138 Z"/>
+                  </g>
+                </g>
+                <path d="M360 240 C450 225 520 250 600 240 C700 230 760 255 840 240"
+                  stroke="rgba(255,255,255,.12)" stroke-width="3" fill="none"/>
+                <g opacity=".55" fill="rgba(255,255,255,.16)">
+                  <path d="M380 242 L396 262 L412 242 Z"/><path d="M418 242 L434 262 L450 242 Z"/><path d="M456 242 L472 262 L488 242 Z"/>
+                  <path d="M494 242 L510 262 L526 242 Z"/><path d="M532 242 L548 262 L564 242 Z"/><path d="M570 242 L586 262 L602 242 Z"/>
+                  <path d="M608 242 L624 262 L640 242 Z"/><path d="M646 242 L662 262 L678 242 Z"/><path d="M684 242 L700 262 L716 242 Z"/>
+                  <path d="M722 242 L738 262 L754 242 Z"/><path d="M760 242 L776 262 L792 242 Z"/><path d="M798 242 L814 262 L830 242 Z"/>
+                </g>
+              </svg>
+            </div>
+
             <div class="stands">
               <div class="crowd" id="crowd"></div>
             </div>
@@ -897,27 +1010,21 @@
                   <span id="oddsBanner">Overround: —</span>
                 </div>
                 <div class="bookieArt">
-                  <!-- more detailed bookie (still vector) -->
                   <svg viewBox="0 0 260 340" aria-label="Bookie">
-                    <!-- booth -->
                     <rect x="35" y="60" width="190" height="240" rx="22" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.12)"/>
                     <rect x="35" y="230" width="190" height="70" rx="18" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.12)"/>
                     <text x="58" y="92" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">ODDS INSIDE</text>
 
-                    <!-- bookie person -->
                     <circle cx="140" cy="140" r="22" fill="rgba(255,255,255,.82)"/>
                     <rect x="116" y="164" width="48" height="56" rx="18" fill="rgba(255,255,255,.18)"/>
                     <rect x="106" y="178" width="26" height="12" rx="6" fill="rgba(255,255,255,.14)"/>
                     <rect x="148" y="178" width="26" height="12" rx="6" fill="rgba(255,255,255,.14)"/>
 
-                    <!-- hat -->
                     <rect x="118" y="112" width="44" height="14" rx="6" fill="rgba(255,255,255,.22)"/>
                     <rect x="112" y="124" width="56" height="8" rx="4" fill="rgba(255,255,255,.16)"/>
 
-                    <!-- arm -->
                     <rect class="arm" x="164" y="188" width="62" height="14" rx="7" fill="rgba(255,255,255,.28)"/>
 
-                    <!-- cash tray -->
                     <rect x="86" y="250" width="120" height="26" rx="12" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.10)"/>
                     <g class="cash">
                       <rect x="150" y="246" width="42" height="14" rx="4" fill="rgba(255,255,255,.18)"/>
@@ -925,17 +1032,15 @@
                       <rect x="142" y="266" width="58" height="14" rx="4" fill="rgba(255,255,255,.32)"/>
                     </g>
 
-                    <!-- eyes -->
                     <circle cx="132" cy="138" r="3" fill="rgba(0,0,0,.72)"/>
                     <circle cx="148" cy="138" r="3" fill="rgba(0,0,0,.72)"/>
                   </svg>
                 </div>
               </div>
 
-              <!-- Confetti -->
               <div class="confetti" id="confetti"></div>
 
-              <!-- Horses + dust (colored) -->
+              <!-- Horses -->
               <div class="horse c1" id="h0" style="top: 4%;">
                 <div class="tag"><b>H1</b><span id="o0">—</span></div>
                 <svg viewBox="0 0 90 48" aria-hidden="true">
@@ -961,9 +1066,8 @@
                     </g>
                   </g>
                 </svg>
-                <div class="odds"> </div>
               </div>
-              <div class="dust" style="top: 4%;"><i style="left:34px"></i><i style="left:58px; animation-delay:80ms"></i><i style="left:78px; animation-delay:160ms"></i></div>
+              <div class="dust" style="top: 4%;"><i style="left:40px"></i><i style="left:72px; animation-delay:80ms"></i><i style="left:102px; animation-delay:160ms"></i></div>
 
               <div class="horse c2" id="h1" style="top: 24%;">
                 <div class="tag"><b>H2</b><span id="o1">—</span></div>
@@ -990,9 +1094,8 @@
                     </g>
                   </g>
                 </svg>
-                <div class="odds"> </div>
               </div>
-              <div class="dust" style="top: 24%;"><i style="left:34px"></i><i style="left:58px; animation-delay:80ms"></i><i style="left:78px; animation-delay:160ms"></i></div>
+              <div class="dust" style="top: 24%;"><i style="left:40px"></i><i style="left:72px; animation-delay:80ms"></i><i style="left:102px; animation-delay:160ms"></i></div>
 
               <div class="horse c3" id="h2" style="top: 44%;">
                 <div class="tag"><b>H3</b><span id="o2">—</span></div>
@@ -1019,9 +1122,8 @@
                     </g>
                   </g>
                 </svg>
-                <div class="odds"> </div>
               </div>
-              <div class="dust" style="top: 44%;"><i style="left:34px"></i><i style="left:58px; animation-delay:80ms"></i><i style="left:78px; animation-delay:160ms"></i></div>
+              <div class="dust" style="top: 44%;"><i style="left:40px"></i><i style="left:72px; animation-delay:80ms"></i><i style="left:102px; animation-delay:160ms"></i></div>
 
               <div class="horse c4" id="h3" style="top: 64%;">
                 <div class="tag"><b>H4</b><span id="o3">—</span></div>
@@ -1048,9 +1150,8 @@
                     </g>
                   </g>
                 </svg>
-                <div class="odds"> </div>
               </div>
-              <div class="dust" style="top: 64%;"><i style="left:34px"></i><i style="left:58px; animation-delay:80ms"></i><i style="left:78px; animation-delay:160ms"></i></div>
+              <div class="dust" style="top: 64%;"><i style="left:40px"></i><i style="left:72px; animation-delay:80ms"></i><i style="left:102px; animation-delay:160ms"></i></div>
 
               <div class="horse c5" id="h4" style="top: 84%;">
                 <div class="tag"><b>H5</b><span id="o4">—</span></div>
@@ -1077,9 +1178,8 @@
                     </g>
                   </g>
                 </svg>
-                <div class="odds"> </div>
               </div>
-              <div class="dust" style="top: 84%;"><i style="left:34px"></i><i style="left:58px; animation-delay:80ms"></i><i style="left:78px; animation-delay:160ms"></i></div>
+              <div class="dust" style="top: 84%;"><i style="left:40px"></i><i style="left:72px; animation-delay:80ms"></i><i style="left:102px; animation-delay:160ms"></i></div>
 
             </div>
           </div>
@@ -1097,14 +1197,14 @@
   </div>
 
   <script>
-    // --- Dumb banana joke (stable) ---
+    // ---------------- Banana joke ----------------
     const BANANA_PRICE_GBP = 0.25;
     function bananasFromLoss(loss){
       const n = Math.max(0, Math.round(loss / BANANA_PRICE_GBP));
       return n.toLocaleString();
     }
 
-    // --- Fallback demographic anchors (only used if stake/week OFF) ---
+    // ---------------- Fallback demographic anchors ----------------
     const LOSS_PGSI0   = 196.95;
     const LOSS_PGSI1_4 = 955.21;
     const LOSS_PGSI5P  = 2506.91;
@@ -1118,7 +1218,7 @@
     const YOUNG_MULT = 2.27;
     const OLD_MULT   = 0.11;
 
-    // --- Leak presets (keys avoid float compare bugs) ---
+    // ---------------- Leak presets ----------------
     const SPORT_RISK = {
       soccer:    { name:"Soccer",    rate:0.078, note:"~7.8% leak proxy" },
       tennis:    { name:"Tennis",    rate:0.075, note:"~7.5% leak proxy" },
@@ -1131,7 +1231,7 @@
     const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
     const lerp = (a,b,t) => a + (b-a)*t;
 
-    // --- HUD ---
+    // ---------------- HUD ----------------
     const snap = $("snap");
     const pages = Array.from(document.querySelectorAll("section[data-page]"));
     const hudText = $("hudText");
@@ -1151,7 +1251,18 @@
     }
     snap.addEventListener("scroll", updateHUD, { passive:true });
 
-    // --- Model ---
+    // Mark when in race to avoid HUD overlap
+    (function(){
+      const raceSection = document.querySelector('section[data-page="4"]');
+      if (!raceSection) return;
+      const io = new IntersectionObserver((entries)=>{
+        const e = entries[0];
+        document.body.classList.toggle("inRace", e.isIntersecting && e.intersectionRatio > 0.55);
+      }, { threshold:[0,0.55,1] });
+      io.observe(raceSection);
+    })();
+
+    // ---------------- Model ----------------
     let betEnabled = false;
 
     function pgsiMixAmongGamblers(age, sex){
@@ -1342,7 +1453,97 @@
       $("bananaLine").innerHTML = `You could buy: <span style="font-family:var(--mono); color:rgba(255,255,255,.88)">${bananasFromLoss(exp)} bananas</span> 🍌`;
     }
 
-    // ----- Fullscreen Race Game -----
+    // ---------------- Sounds (no external files) ----------------
+    // Uses WebAudio so it works on GitHub Pages without assets.
+    let audioEnabled = false;
+    let audioCtx = null;
+    let master = null;
+    let gallopTimer = null;
+
+    function ensureAudio(){
+      if (!audioCtx){
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        master = audioCtx.createGain();
+        master.gain.value = 0.65;
+        master.connect(audioCtx.destination);
+      }
+      if (audioCtx.state === "suspended") audioCtx.resume();
+    }
+
+    function beep(freq, dur=0.08, type="sine", gain=0.18){
+      if (!audioEnabled) return;
+      ensureAudio();
+      const t = audioCtx.currentTime;
+
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = type;
+      o.frequency.setValueAtTime(freq, t);
+
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(gain, t+0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+
+      o.connect(g); g.connect(master);
+      o.start(t);
+      o.stop(t + dur + 0.02);
+    }
+
+    function noiseBurst(dur=0.10, gain=0.12){
+      if (!audioEnabled) return;
+      ensureAudio();
+      const t = audioCtx.currentTime;
+      const bufferSize = Math.floor(audioCtx.sampleRate * dur);
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i=0;i<bufferSize;i++){
+        data[i] = (Math.random()*2-1) * (1 - i/bufferSize);
+      }
+      const src = audioCtx.createBufferSource();
+      const g = audioCtx.createGain();
+      g.gain.value = gain;
+      src.buffer = buffer;
+      src.connect(g); g.connect(master);
+      src.start(t);
+      src.stop(t + dur);
+    }
+
+    function startGallop(rateMs=140){
+      if (!audioEnabled) return;
+      stopGallop();
+      ensureAudio();
+      gallopTimer = setInterval(() => {
+        // two hoof hits: low thump + higher click
+        beep(90, 0.045, "triangle", 0.12);
+        setTimeout(()=>beep(220, 0.03, "square", 0.06), 28);
+      }, rateMs);
+    }
+    function stopGallop(){
+      if (gallopTimer){ clearInterval(gallopTimer); gallopTimer = null; }
+    }
+
+    function winSound(){
+      if (!audioEnabled) return;
+      ensureAudio();
+      beep(440,0.08,"sine",0.12);
+      setTimeout(()=>beep(660,0.08,"sine",0.12),90);
+      setTimeout(()=>beep(880,0.10,"sine",0.12),180);
+      setTimeout(()=>noiseBurst(0.14,0.10), 210);
+    }
+    function loseSound(){
+      if (!audioEnabled) return;
+      ensureAudio();
+      beep(220,0.10,"sawtooth",0.10);
+      setTimeout(()=>beep(160,0.14,"sawtooth",0.10),90);
+      setTimeout(()=>noiseBurst(0.08,0.10), 120);
+    }
+    function clickSound(){
+      if (!audioEnabled) return;
+      ensureAudio();
+      beep(520,0.03,"square",0.05);
+    }
+
+    // ---------------- Fullscreen Race Game ----------------
     let bank = 100;
     let races = 0;
     let totalStaked = 0;
@@ -1436,18 +1637,18 @@
       c.innerHTML = "";
       c.classList.add("on");
       const colors = ["#ff4d4d","#4dd2ff","#ffe14d","#a84dff","#4dff88"];
-      for (let i=0;i<28;i++){
+      for (let i=0;i<30;i++){
         const p = document.createElement("i");
         const left = Math.random()*100;
         const delay = Math.random()*120;
-        const dur = 760 + Math.random()*420;
+        const dur = 760 + Math.random()*480;
         p.style.left = left + "%";
         p.style.background = colors[i % colors.length];
         p.style.animationDuration = dur + "ms";
         p.style.animationDelay = delay + "ms";
         c.appendChild(p);
       }
-      setTimeout(() => c.classList.remove("on"), 1100);
+      setTimeout(() => c.classList.remove("on"), 1200);
     }
 
     function settleBet(pick, stake, winner){
@@ -1482,26 +1683,33 @@
         bookie.classList.add("pay");
         moneyStream(bookie, bankEl, 18, 760);
         popConfetti();
+        winSound();
       } else {
         bookie.classList.add("take");
         moneyStream(bankEl, bookie, 14, 620);
+        loseSound();
       }
     }
 
-    function runRaceAnimated(pick, stake){
+    function runRaceAnimated(pick, stake, opts={ hyper:false }){
       clearMoney();
 
       const winner = chooseWinner();
       const track = $("track");
-      const finishX = track.clientWidth - 220 - 240; // finish line before bookie
+      const finishX = track.clientWidth - 220 - 260;
       const base = Math.max(240, finishX);
 
       const durations = [];
       for (let i=0;i<5;i++){
         const noise = (Math.random() * 0.26) + 0.95;
         const winBoost = (i === winner) ? 0.86 : 1.0;
-        durations[i] = 1700 * noise * winBoost;
+        durations[i] = (opts.hyper ? 620 : 1700) * noise * winBoost;
       }
+
+      track.classList.toggle("hyper", !!opts.hyper);
+
+      // start gallop sound: faster in hyper
+      startGallop(opts.hyper ? 80 : 140);
 
       for (let i=0;i<5;i++){
         const h = $("h"+i);
@@ -1512,32 +1720,58 @@
 
       const settleIn = Math.max(...durations) + 40;
       setTimeout(() => {
+        stopGallop();
         settleBet(pick, stake, winner);
-        setTimeout(resetHorses, 520);
+        setTimeout(() => {
+          track.classList.remove("hyper");
+          resetHorses();
+        }, 520);
       }, settleIn);
     }
 
-    function runSim(n){
+    function runSimFast(n){
       const pick = Number($("pickHorse").value);
       const stake = Math.max(1, Number($("stake").value || 1));
+      const track = $("track");
 
-      for (let i=0;i<n;i++){
-        const winner = chooseWinner();
-        races += 1;
-        totalStaked += stake;
-        bank -= stake;
-        if (pick === winner){
-          const payout = stake * (bookOdds[winner] - 1);
-          bank += stake + payout;
+      // short "super rapid running" burst, then compute instantly
+      track.classList.add("hyper");
+      for (let i=0;i<5;i++) $("h"+i).classList.add("run");
+      startGallop(70);
+
+      const burstMs = clamp(500 + Math.log10(Math.max(10,n))*250, 650, 1400);
+
+      setTimeout(() => {
+        stopGallop();
+
+        // compute results (instant)
+        for (let i=0;i<n;i++){
+          const winner = chooseWinner();
+          races += 1;
+          totalStaked += stake;
+          bank -= stake;
+          if (pick === winner){
+            const payout = stake * (bookOdds[winner] - 1);
+            bank += stake + payout;
+          }
         }
-      }
 
-      $("bank").textContent = "£" + bank.toFixed(2);
-      $("races").textContent = String(races);
-      const roi = totalStaked > 0 ? ((bank - 100) / totalStaked) * 100 : 0;
-      $("roi").textContent = roi.toFixed(2) + "%";
-      $("lastResult").textContent = `Last: simulated ${n.toLocaleString()} races`;
-      clearMoney();
+        $("bank").textContent = "£" + bank.toFixed(2);
+        $("races").textContent = String(races);
+        const roi = totalStaked > 0 ? ((bank - 100) / totalStaked) * 100 : 0;
+        $("roi").textContent = roi.toFixed(2) + "%";
+        $("lastResult").textContent = `Last: simulated ${n.toLocaleString()} races`;
+
+        // end visuals
+        track.classList.remove("hyper");
+        resetHorses();
+
+        // tiny "result" sound
+        if (audioEnabled){
+          clickSound();
+          setTimeout(()=>beep(320,0.05,"triangle",0.06), 60);
+        }
+      }, burstMs);
     }
 
     function resetGame(){
@@ -1565,7 +1799,7 @@
     function buildCrowd(){
       const crowd = $("crowd");
       crowd.innerHTML = "";
-      const n = 140;
+      const n = 150;
       for (let i=0;i<n;i++){
         const p = document.createElement("i");
         p.style.left = (Math.random()*100) + "%";
@@ -1577,39 +1811,87 @@
       }
     }
 
-    // --- Wire inputs ---
+    // ---------------- Wire inputs ----------------
     $("betSwitch").addEventListener("click", () => {
       betEnabled = !betEnabled;
       setBetUI();
       recalc();
+      clickSound();
     });
     $("betPerWeek").addEventListener("input", recalc);
-    $("sportKey").addEventListener("change", recalc);
+    $("sportKey").addEventListener("change", () => { recalc(); clickSound(); });
     $("income").addEventListener("input", recalc);
     $("age").addEventListener("input", recalc);
-    $("sex").addEventListener("change", recalc);
+    $("sex").addEventListener("change", () => { recalc(); clickSound(); });
 
-    // --- Wire game ---
+    // ---------------- Wire game ----------------
+    $("soundBtn").addEventListener("click", async () => {
+      audioEnabled = !audioEnabled;
+      const btn = $("soundBtn");
+      btn.classList.toggle("on", audioEnabled);
+      $("soundLabel").textContent = audioEnabled ? "Sound ON" : "Sound OFF";
+      if (audioEnabled){
+        ensureAudio();
+        // quick “ready” chirp
+        beep(520,0.05,"triangle",0.08);
+        setTimeout(()=>beep(740,0.06,"triangle",0.08), 60);
+      } else {
+        stopGallop();
+      }
+    });
+
     $("raceBtn").addEventListener("click", () => {
       const pick = Number($("pickHorse").value);
       const stake = Math.max(1, Number($("stake").value || 1));
-      runRaceAnimated(pick, stake);
+      clickSound();
+      runRaceAnimated(pick, stake, { hyper:false });
     });
-    $("sim1kBtn").addEventListener("click", () => runSim(1000));
-    $("sim10kBtn").addEventListener("click", () => runSim(10000));
-    $("resetBankBtn").addEventListener("click", resetGame);
+
+    $("runCustomBtn").addEventListener("click", () => {
+      const n = clamp(Number($("raceCount").value || 1), 1, 200000);
+      $("raceCount").value = String(n);
+      clickSound();
+      if (n === 1){
+        const pick = Number($("pickHorse").value);
+        const stake = Math.max(1, Number($("stake").value || 1));
+        runRaceAnimated(pick, stake, { hyper:false });
+      } else if (n <= 15){
+        // For small N, do a quick hyper single animation per run (feels like multiple races)
+        const pick = Number($("pickHorse").value);
+        const stake = Math.max(1, Number($("stake").value || 1));
+        let i = 0;
+        const step = () => {
+          i++;
+          runRaceAnimated(pick, stake, { hyper:true });
+          // wait until this mini race settles
+          setTimeout(() => { if (i < n) step(); }, 820);
+        };
+        step();
+      } else {
+        // For large N, show a rapid “hyper burst” then compute instantly
+        runSimFast(n);
+      }
+    });
+
+    $("resetBankBtn").addEventListener("click", () => {
+      clickSound();
+      resetGame();
+    });
+
     $("overround").addEventListener("change", () => {
       const ov = Number($("overround").value);
       bookOdds = computeBookOdds(ov);
       updateRaceUI();
+      clickSound();
     });
 
-    // --- Init ---
+    // ---------------- Init ----------------
     updateHUD();
     setBetUI();
     buildCrowd();
     recalc();
     resetGame();
+
   </script>
 </body>
 </html>
