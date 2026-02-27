@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Expected Gambling Loss — Story + Goop + Simulator</title>
+  <title>Expected Gambling Loss — Story + Simulator</title>
 
   <style>
     :root{
@@ -342,20 +342,7 @@
     /* 3D tilt */
     .tilt{ transform: rotateX(0) rotateY(0) translateZ(0); will-change: transform; }
 
-    /* GOOP OVERLAY (metaballs + goo filter) */
-    .goop{
-      position:fixed;
-      inset:0;
-      z-index:4;
-      pointer-events:none;
-      opacity:0;
-      transition: opacity .22s ease;
-      mix-blend-mode: screen;
-    }
-    .goop.on{ opacity:1; }
-    .goop svg{ width:100%; height:100%; display:block; }
-
-    /* Horse game */
+    /* ---------- HORSE GAME (upgraded) ---------- */
     .gameRow{
       display:grid;
       grid-template-columns: 1fr;
@@ -395,48 +382,204 @@
       position:relative;
       border:1px solid rgba(255,255,255,.10);
       border-radius: 16px;
-      background: rgba(0,0,0,.40);
-      height: 210px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.01));
+      height: 260px;
       overflow:hidden;
     }
-    .lane{
-      position:absolute;
-      left:0; right:0;
-      height: 42px;
-      border-top: 1px solid rgba(255,255,255,.06);
+
+    /* cinematic vignette */
+    .track:before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(60% 120% at 20% 50%, rgba(255,255,255,.05), transparent 55%),
+        radial-gradient(60% 120% at 80% 50%, rgba(0,0,0,.55), transparent 60%),
+        linear-gradient(90deg, rgba(0,0,0,.35), transparent 20%, transparent 80%, rgba(0,0,0,.35));
+      pointer-events:none;
     }
-    .horse{
-      position:absolute;
-      left: 10px;
-      width: 90px;
-      height: 28px;
-      border-radius: 999px;
-      border:1px solid rgba(255,255,255,.16);
-      background: rgba(255,255,255,.10);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding: 0 10px;
-      font-family: var(--mono);
-      font-size: 12px;
-      color: rgba(255,255,255,.82);
-      will-change: transform;
+
+    .lane{
+      position:absolute; left:0; right:0;
+      height: 52px;
+      border-top: 1px solid rgba(255,255,255,.07);
     }
     .finish{
       position:absolute;
       top:0; bottom:0;
-      right: 40px;
+      right: 150px;
       width: 2px;
-      background: rgba(255,255,255,.28);
+      background: rgba(255,255,255,.30);
     }
-    .flag{
+    .finish:after{
+      content:"";
       position:absolute;
-      top: 12px;
-      right: 12px;
+      right:-10px; top:0; bottom:0;
+      width: 20px;
+      background:
+        repeating-linear-gradient(
+          180deg,
+          rgba(255,255,255,.22) 0 10px,
+          rgba(0,0,0,.00) 10px 20px
+        );
+      opacity:.35;
+    }
+
+    .bookie{
+      position:absolute;
+      top: 10px;
+      right: 10px;
+      width: 130px;
+      height: 240px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.55);
+      overflow:hidden;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+    }
+    .bookie svg{
+      width: 140px;
+      height: 240px;
+      display:block;
+      opacity:.95;
+    }
+    .bookieLabel{
+      position:absolute;
+      top: 10px; left: 10px;
       font-family: var(--mono);
       font-size: 11px;
       color: rgba(255,255,255,.60);
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      z-index:2;
     }
+
+    .horseWrap{
+      position:absolute;
+      left: 14px;
+      width: 140px;
+      height: 40px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(255,255,255,.80);
+      will-change: transform;
+    }
+
+    .horseSvg{
+      width: 54px;
+      height: 24px;
+      overflow: visible;
+    }
+
+    /* gallop animation toggled with .run */
+    .horseWrap.run .body{
+      animation: bob 220ms infinite ease-in-out;
+      transform-origin: 10px 12px;
+    }
+    .horseWrap.run .legA{
+      animation: legA 160ms infinite ease-in-out;
+      transform-origin: 10px 18px;
+    }
+    .horseWrap.run .legB{
+      animation: legB 160ms infinite ease-in-out;
+      transform-origin: 10px 18px;
+    }
+    .horseWrap.run .tail{
+      animation: tail 240ms infinite ease-in-out;
+      transform-origin: 6px 12px;
+    }
+
+    @keyframes bob{
+      0%{ transform: translateY(0); }
+      50%{ transform: translateY(1.5px); }
+      100%{ transform: translateY(0); }
+    }
+    @keyframes legA{
+      0%{ transform: rotate(18deg); }
+      50%{ transform: rotate(-18deg); }
+      100%{ transform: rotate(18deg); }
+    }
+    @keyframes legB{
+      0%{ transform: rotate(-18deg); }
+      50%{ transform: rotate(18deg); }
+      100%{ transform: rotate(-18deg); }
+    }
+    @keyframes tail{
+      0%{ transform: rotate(10deg); }
+      50%{ transform: rotate(-10deg); }
+      100%{ transform: rotate(10deg); }
+    }
+
+    /* dust particles */
+    .dust{
+      position:absolute;
+      left: 10px;
+      width: 120px;
+      height: 52px;
+      pointer-events:none;
+      opacity:0;
+    }
+    .horseWrap.run + .dust{
+      opacity:1;
+    }
+    .dust i{
+      position:absolute;
+      bottom: 10px;
+      width: 6px; height: 6px;
+      border-radius:999px;
+      background: rgba(255,255,255,.14);
+      animation: dust 420ms infinite ease-out;
+    }
+    .dust i:nth-child(2){ left: 20px; animation-delay: 80ms; opacity:.8; }
+    .dust i:nth-child(3){ left: 34px; animation-delay: 160ms; opacity:.6; }
+    .dust i:nth-child(4){ left: 50px; animation-delay: 240ms; opacity:.5; }
+    @keyframes dust{
+      0%{ transform: translateX(0) translateY(0) scale(0.9); opacity:.45; }
+      100%{ transform: translateX(-24px) translateY(-10px) scale(1.2); opacity:0; }
+    }
+
+    /* money stream animation (created dynamically) */
+    .money{
+      position:absolute;
+      width: 10px;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255,255,255,.82);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.18);
+      pointer-events:none;
+      opacity:0;
+      will-change: transform, opacity;
+    }
+
+    /* bookie arm animation toggles */
+    .bookie.pay .arm{
+      animation: armPay 420ms ease-in-out 1;
+      transform-origin: 74px 126px;
+    }
+    .bookie.take .arm{
+      animation: armTake 420ms ease-in-out 1;
+      transform-origin: 74px 126px;
+    }
+    @keyframes armPay{
+      0%{ transform: rotate(0deg) translateX(0); }
+      50%{ transform: rotate(-12deg) translateX(-3px); }
+      100%{ transform: rotate(0deg) translateX(0); }
+    }
+    @keyframes armTake{
+      0%{ transform: rotate(0deg) translateX(0); }
+      50%{ transform: rotate(10deg) translateX(2px); }
+      100%{ transform: rotate(0deg) translateX(0); }
+    }
+
     .bank{
       display:flex;
       gap:12px;
@@ -448,38 +591,15 @@
       font-size: 12px;
       margin-top: 10px;
     }
+
+    .bank strong{
+      color: rgba(255,255,255,.92);
+      font-weight: 800;
+    }
   </style>
 </head>
 
 <body>
-  <!-- GOOP overlay -->
-  <div class="goop" id="goop">
-    <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-      <defs>
-        <!-- Classic SVG goo (blur + threshold) -->
-        <filter id="goo">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
-          <feColorMatrix in="blur" mode="matrix"
-            values="
-              1 0 0 0 0
-              0 1 0 0 0
-              0 0 1 0 0
-              0 0 0 22 -10" result="goo" />
-          <feComposite in="goo" in2="SourceGraphic" operator="atop"/>
-        </filter>
-      </defs>
-
-      <g filter="url(#goo)" id="goopGroup" opacity="0.95">
-        <!-- circles are updated by JS -->
-        <circle cx="20" cy="50" r="10" fill="white"></circle>
-        <circle cx="35" cy="52" r="12" fill="white"></circle>
-        <circle cx="52" cy="48" r="11" fill="white"></circle>
-        <circle cx="68" cy="50" r="9"  fill="white"></circle>
-        <circle cx="82" cy="52" r="13" fill="white"></circle>
-      </g>
-    </svg>
-  </div>
-
   <!-- HUD -->
   <div class="hud" aria-hidden="true">
     <span class="dot"></span>
@@ -496,7 +616,7 @@
           <div class="kicker">Story mode • scroll to progress</div>
           <h1>Money doesn’t vanish.<br/>It leaks.</h1>
           <div class="sub">
-            You’ll feed the model in stages. If you provide <span style="font-family:var(--mono)">bet/week</span>, the £ result is driven by wager maths — not age or gender.
+            Feed the model in stages. If you provide <span style="font-family:var(--mono)">bet/week</span>, the £ result is driven by wager maths — not age or gender.
           </div>
           <div class="pill"><span class="pDot"></span> ASSUMPTION: gambles this year</div>
         </div>
@@ -534,7 +654,7 @@
               </div>
 
               <div class="note">
-                This “bet type” is a long-run expected loss rate proxy (bookmaker margin / realized loss rate).
+                “Bet type” is a long-run expected loss rate proxy (margin / realized loss rate).
               </div>
             </div>
           </div>
@@ -647,7 +767,7 @@
         </div>
       </section>
 
-      <!-- 5: Result + Leak map + bananas -->
+      <!-- 5: Result -->
       <section data-chapter="5">
         <div class="wrap">
           <div class="card tilt" id="cResult">
@@ -671,23 +791,15 @@
               </div>
 
               <div class="note" style="font-family:var(--mono)" id="capLine">CAPS: —</div>
-
-              <div class="note" id="bananaLine">
-                You could buy: —
-              </div>
-
-              <div class="note">
-                Fun fact math uses an ONS banana price per kg and a rough “bananas per kg” assumption.
-              </div>
+              <div class="note" id="bananaLine">You could buy: —</div>
+              <div class="note">Banana math is intentionally dumb: it’s for intuition, not economics.</div>
             </div>
           </div>
 
           <div class="card tilt" id="cSports">
             <div class="inner">
               <div class="title">Where you’re most likely to leak money</div>
-              <div class="note" style="margin-top:-4px;">
-                “Leak size” = long-run expected loss proxy. Higher means worse value on average.
-              </div>
+              <div class="note" style="margin-top:-4px;">“Leak size” = expected loss-rate proxy. Higher = worse value on average.</div>
 
               <div class="viz">
                 <svg viewBox="0 0 520 220" width="100%" height="220" aria-label="Leak map">
@@ -703,20 +815,18 @@
         </div>
       </section>
 
-      <!-- 6: Horse race simulator -->
+      <!-- 6: Horse simulator -->
       <section data-chapter="6">
         <div class="wrap">
           <div class="card tilt" id="cGame">
             <div class="inner">
               <div class="title">Bonus — Horse racing simulator</div>
-              <div class="note" style="margin-top:-4px;">
-                A tiny game that demonstrates “house advantage” via <span style="font-family:var(--mono)">overround</span> (book > 100%).
-              </div>
+              <div class="note" style="margin-top:-4px;">Pick a horse. Bet. Watch the bookie win in the long run.</div>
 
               <div class="gameRow">
                 <div class="gameControls">
                   <div class="left">
-                    <label style="font-family:var(--sans)">Pick</label>
+                    <label>Pick</label>
                     <select id="pickHorse" style="width:160px;">
                       <option value="0">Horse 1</option>
                       <option value="1">Horse 2</option>
@@ -725,10 +835,10 @@
                       <option value="4">Horse 5</option>
                     </select>
 
-                    <label style="font-family:var(--sans)">Stake (£)</label>
+                    <label>Stake (£)</label>
                     <input id="stake" type="number" min="1" step="1" value="5" style="width:110px;" />
 
-                    <label style="font-family:var(--sans)">Overround</label>
+                    <label>Overround</label>
                     <select id="overround" style="width:140px;">
                       <option value="1.05">105% (tight)</option>
                       <option value="1.12" selected>112% (typical-ish)</option>
@@ -746,28 +856,171 @@
 
                 <div class="track" id="track">
                   <div class="finish"></div>
-                  <div class="flag" id="oddsBanner">Odds: —</div>
-                  <div class="lane" style="top:42px;"></div>
-                  <div class="lane" style="top:84px;"></div>
-                  <div class="lane" style="top:126px;"></div>
-                  <div class="lane" style="top:168px;"></div>
 
-                  <div class="horse" id="h0" style="top:12px;"><span>H1</span><span id="o0">—</span></div>
-                  <div class="horse" id="h1" style="top:54px;"><span>H2</span><span id="o1">—</span></div>
-                  <div class="horse" id="h2" style="top:96px;"><span>H3</span><span id="o2">—</span></div>
-                  <div class="horse" id="h3" style="top:138px;"><span>H4</span><span id="o3">—</span></div>
-                  <div class="horse" id="h4" style="top:180px;"><span>H5</span><span id="o4">—</span></div>
+                  <div class="bookie" id="bookie">
+                    <div class="bookieLabel" id="oddsBanner">Overround: —</div>
+                    <!-- bookie booth + character -->
+                    <svg viewBox="0 0 140 240" aria-label="Bookie">
+                      <!-- booth -->
+                      <rect x="10" y="30" width="120" height="170" rx="14" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.12)"/>
+                      <rect x="10" y="160" width="120" height="40" rx="12" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.12)"/>
+                      <text x="24" y="56" fill="rgba(255,255,255,.55)" font-size="10" font-family="ui-monospace, monospace">BOOKIE</text>
+                      <!-- head -->
+                      <circle cx="74" cy="92" r="16" fill="rgba(255,255,255,.82)"/>
+                      <!-- hat -->
+                      <rect x="58" y="72" width="32" height="10" rx="4" fill="rgba(255,255,255,.25)"/>
+                      <rect x="54" y="80" width="40" height="6" rx="3" fill="rgba(255,255,255,.18)"/>
+                      <!-- body -->
+                      <rect x="60" y="110" width="28" height="32" rx="10" fill="rgba(255,255,255,.25)"/>
+                      <!-- arm -->
+                      <rect class="arm" x="84" y="118" width="30" height="8" rx="4" fill="rgba(255,255,255,.35)"/>
+                      <!-- money stack -->
+                      <rect x="94" y="174" width="24" height="10" rx="3" fill="rgba(255,255,255,.20)"/>
+                      <rect x="92" y="182" width="28" height="10" rx="3" fill="rgba(255,255,255,.26)"/>
+                      <rect x="90" y="190" width="32" height="10" rx="3" fill="rgba(255,255,255,.32)"/>
+                      <!-- eyes -->
+                      <circle cx="69" cy="90" r="2" fill="rgba(0,0,0,.7)"/>
+                      <circle cx="79" cy="90" r="2" fill="rgba(0,0,0,.7)"/>
+                    </svg>
+                  </div>
+
+                  <div class="lane" style="top:52px;"></div>
+                  <div class="lane" style="top:104px;"></div>
+                  <div class="lane" style="top:156px;"></div>
+                  <div class="lane" style="top:208px;"></div>
+
+                  <!-- horses (SVG + dust) -->
+                  <div class="horseWrap" id="h0" style="top:10px;">
+                    <span>H1</span>
+                    <svg class="horseSvg" viewBox="0 0 60 28" aria-hidden="true">
+                      <g class="body">
+                        <ellipse cx="28" cy="14" rx="12" ry="8" fill="rgba(255,255,255,.78)"/>
+                        <circle cx="41" cy="12" r="5" fill="rgba(255,255,255,.78)"/>
+                        <rect x="18" y="6" width="6" height="8" rx="3" fill="rgba(255,255,255,.55)"/>
+                        <g class="tail">
+                          <path d="M16 14 C10 10, 10 18, 16 16" stroke="rgba(255,255,255,.55)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                        </g>
+                        <g class="legA">
+                          <path d="M24 20 L20 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M32 20 L28 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
+                        </g>
+                        <g class="legB">
+                          <path d="M28 20 L24 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M36 20 L32 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
+                        </g>
+                      </g>
+                    </svg>
+                    <span id="o0">—</span>
+                  </div>
+                  <div class="dust"><i style="left:14px"></i><i></i><i></i><i></i></div>
+
+                  <div class="horseWrap" id="h1" style="top:62px;">
+                    <span>H2</span>
+                    <svg class="horseSvg" viewBox="0 0 60 28" aria-hidden="true">
+                      <g class="body">
+                        <ellipse cx="28" cy="14" rx="12" ry="8" fill="rgba(255,255,255,.78)"/>
+                        <circle cx="41" cy="12" r="5" fill="rgba(255,255,255,.78)"/>
+                        <rect x="18" y="6" width="6" height="8" rx="3" fill="rgba(255,255,255,.55)"/>
+                        <g class="tail">
+                          <path d="M16 14 C10 10, 10 18, 16 16" stroke="rgba(255,255,255,.55)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                        </g>
+                        <g class="legA">
+                          <path d="M24 20 L20 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M32 20 L28 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
+                        </g>
+                        <g class="legB">
+                          <path d="M28 20 L24 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M36 20 L32 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
+                        </g>
+                      </g>
+                    </svg>
+                    <span id="o1">—</span>
+                  </div>
+                  <div class="dust"><i style="left:14px"></i><i></i><i></i><i></i></div>
+
+                  <div class="horseWrap" id="h2" style="top:114px;">
+                    <span>H3</span>
+                    <svg class="horseSvg" viewBox="0 0 60 28" aria-hidden="true">
+                      <g class="body">
+                        <ellipse cx="28" cy="14" rx="12" ry="8" fill="rgba(255,255,255,.78)"/>
+                        <circle cx="41" cy="12" r="5" fill="rgba(255,255,255,.78)"/>
+                        <rect x="18" y="6" width="6" height="8" rx="3" fill="rgba(255,255,255,.55)"/>
+                        <g class="tail">
+                          <path d="M16 14 C10 10, 10 18, 16 16" stroke="rgba(255,255,255,.55)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                        </g>
+                        <g class="legA">
+                          <path d="M24 20 L20 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M32 20 L28 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
+                        </g>
+                        <g class="legB">
+                          <path d="M28 20 L24 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M36 20 L32 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
+                        </g>
+                      </g>
+                    </svg>
+                    <span id="o2">—</span>
+                  </div>
+                  <div class="dust"><i style="left:14px"></i><i></i><i></i><i></i></div>
+
+                  <div class="horseWrap" id="h3" style="top:166px;">
+                    <span>H4</span>
+                    <svg class="horseSvg" viewBox="0 0 60 28" aria-hidden="true">
+                      <g class="body">
+                        <ellipse cx="28" cy="14" rx="12" ry="8" fill="rgba(255,255,255,.78)"/>
+                        <circle cx="41" cy="12" r="5" fill="rgba(255,255,255,.78)"/>
+                        <rect x="18" y="6" width="6" height="8" rx="3" fill="rgba(255,255,255,.55)"/>
+                        <g class="tail">
+                          <path d="M16 14 C10 10, 10 18, 16 16" stroke="rgba(255,255,255,.55)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                        </g>
+                        <g class="legA">
+                          <path d="M24 20 L20 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M32 20 L28 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
+                        </g>
+                        <g class="legB">
+                          <path d="M28 20 L24 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M36 20 L32 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
+                        </g>
+                      </g>
+                    </svg>
+                    <span id="o3">—</span>
+                  </div>
+                  <div class="dust"><i style="left:14px"></i><i></i><i></i><i></i></div>
+
+                  <div class="horseWrap" id="h4" style="top:218px;">
+                    <span>H5</span>
+                    <svg class="horseSvg" viewBox="0 0 60 28" aria-hidden="true">
+                      <g class="body">
+                        <ellipse cx="28" cy="14" rx="12" ry="8" fill="rgba(255,255,255,.78)"/>
+                        <circle cx="41" cy="12" r="5" fill="rgba(255,255,255,.78)"/>
+                        <rect x="18" y="6" width="6" height="8" rx="3" fill="rgba(255,255,255,.55)"/>
+                        <g class="tail">
+                          <path d="M16 14 C10 10, 10 18, 16 16" stroke="rgba(255,255,255,.55)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                        </g>
+                        <g class="legA">
+                          <path d="M24 20 L20 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M32 20 L28 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
+                        </g>
+                        <g class="legB">
+                          <path d="M28 20 L24 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M36 20 L32 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
+                        </g>
+                      </g>
+                    </svg>
+                    <span id="o4">—</span>
+                  </div>
+                  <div class="dust"><i style="left:14px"></i><i></i><i></i><i></i></div>
+
                 </div>
 
                 <div class="bank">
-                  <div>Bankroll: <span id="bank" style="color:rgba(255,255,255,.9)">£100</span></div>
-                  <div>Races: <span id="races">0</span></div>
-                  <div>ROI: <span id="roi">0.00%</span></div>
+                  <div>Bankroll: <strong id="bank">£100.00</strong></div>
+                  <div>Races: <strong id="races">0</strong></div>
+                  <div>ROI: <strong id="roi">0.00%</strong></div>
                   <div id="lastResult">Last: —</div>
                 </div>
 
                 <div class="note">
-                  This is a simplified model: we generate “true” win probabilities, then create bookmaker odds by applying overround (so expected value is negative).
+                  The “house edge” comes from overround: bookmaker-implied probabilities sum to > 1.
                 </div>
               </div>
             </div>
@@ -775,11 +1028,9 @@
 
           <div class="card tilt" id="cOutro">
             <div class="inner">
-              <div class="title">That’s the point</div>
-              <div class="sub" style="margin-top:0;">
-                Over a big enough sample, the maths wins.
-              </div>
-              <div class="pill"><span class="pDot"></span> back to the top and try different inputs</div>
+              <div class="title">Done</div>
+              <div class="sub" style="margin-top:0;">Over a big enough sample, the maths wins.</div>
+              <div class="pill"><span class="pDot"></span> scroll up and mess with it</div>
             </div>
           </div>
         </div>
@@ -789,15 +1040,14 @@
   </div>
 
   <script>
-    // -----------------------------
-    // SOURCES / ASSUMPTIONS (kept simple in code)
-    // -----------------------------
-    // Banana price: ONS RPI "Ave price - Bananas, per Kg" shows ~102 pence per kg in the latest visible monthly row on the page snapshot.
-    // We'll use £1.02/kg as a "fun" calculation baseline and say it's a rough, not exact.
-    const BANANA_PRICE_PER_KG_GBP = 1.02;
-    const BANANAS_PER_KG = 8; // assumption: ~125g each incl. peel-ish
+    // Banana stat: keep it dumb & stable
+    const BANANA_PRICE_GBP = 0.25; // rough “single banana” price for the joke
+    function bananasFromLoss(loss){
+      const n = Math.max(0, Math.round(loss / BANANA_PRICE_GBP));
+      return n.toLocaleString();
+    }
 
-    // Demographic fallback anchors (open-banking style, used only when bet/week is OFF)
+    // Fallback demographic anchors (used only if bet/week OFF)
     const LOSS_PGSI0   = 196.95;
     const LOSS_PGSI1_4 = 955.21;
     const LOSS_PGSI5P  = 2506.91;
@@ -811,119 +1061,40 @@
     const YOUNG_MULT = 2.27;
     const OLD_MULT   = 0.11;
 
-    // Sports leak presets (keyed -> fixes the old float equality bug)
+    // Sport leak presets (keys avoid float-equality bugs)
     const SPORT_RISK = {
       soccer:    { name:"Soccer",    rate:0.078, note:"~7.8% leak proxy" },
       tennis:    { name:"Tennis",    rate:0.075, note:"~7.5% leak proxy" },
       racing:    { name:"Racing",    rate:0.120, note:"fatter books vary" },
       greyhound: { name:"Greyhound", rate:0.260, note:"very fat books" },
     };
-    const SPORT_ORDER = ["greyhound","racing","soccer","tennis"]; // high->low-ish
+    const SPORT_ORDER = ["greyhound","racing","soccer","tennis"];
 
     const $ = (id) => document.getElementById(id);
     const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
     const lerp = (a,b,t) => a + (b-a)*t;
 
-    // -----------------------------
-    // GOOP (metaballs) tied to scroll
-    // -----------------------------
-    const goop = $("goop");
-    const goopGroup = $("goopGroup");
-    const goopCircles = Array.from(goopGroup.querySelectorAll("circle"));
-    let goopActiveUntil = 0;
-
-    function triggerGoop(ms=520){
-      goopActiveUntil = Math.max(goopActiveUntil, performance.now() + ms);
-      goop.classList.add("on");
-    }
-
-    function animateGoop(t){
-      // if not active, fade out
-      if (t > goopActiveUntil){
-        goop.classList.remove("on");
-      }
-
-      // metaball motion: smooth + “sling” across screen
-      const w = 100, h = 100;
-      const baseY = 50 + Math.sin(t/900)*6;
-      const driftX = (Math.sin(t/700)*10) + 50;
-
-      // shove based on scroll velocity (stored globally)
-      const shove = clamp(scrollVel*2.2, -18, 18);
-
-      for (let i=0;i<goopCircles.length;i++){
-        const c = goopCircles[i];
-        const phase = (i+1)*0.9;
-        const cx = clamp(driftX + Math.sin(t/380 + phase)*18 + shove, 8, 92);
-        const cy = clamp(baseY + Math.cos(t/420 + phase)*14, 10, 90);
-        const r  = 9 + (i%3)*2 + (Math.sin(t/500 + phase)*1.5);
-        c.setAttribute("cx", cx.toFixed(2));
-        c.setAttribute("cy", cy.toFixed(2));
-        c.setAttribute("r",  r.toFixed(2));
-      }
-
-      requestAnimationFrame(animateGoop);
-    }
-
-    // -----------------------------
-    // Story + HUD + chapter detection
-    // -----------------------------
+    // HUD + chapters
     const snap = $("snap");
     const sections = Array.from(document.querySelectorAll("section[data-chapter]"));
     const hudText = $("hudText");
-    const hudBar  = $("hudBar");
-
-    let lastScrollTop = 0;
-    let scrollVel = 0;
+    const hudBar = $("hudBar");
 
     function updateHUD(){
       const st = snap.scrollTop;
       const max = Math.max(1, snap.scrollHeight - snap.clientHeight);
-      const pct = clamp(st / max, 0, 1);
-      hudBar.style.width = (pct*100).toFixed(1) + "%";
+      hudBar.style.width = ((st / max) * 100).toFixed(1) + "%";
 
-      // chapter: pick nearest section top
-      let best = 0;
-      let bestDist = Infinity;
+      let best = 0, bestDist = Infinity;
       for (let i=0;i<sections.length;i++){
-        const top = sections[i].offsetTop;
-        const d = Math.abs(top - st);
+        const d = Math.abs(sections[i].offsetTop - st);
         if (d < bestDist){ bestDist = d; best = i; }
       }
       hudText.textContent = `CHAPTER ${best+1} / ${sections.length}`;
     }
+    snap.addEventListener("scroll", updateHUD, { passive:true });
 
-    // Trigger goop on snap transitions
-    let lastChapter = 1;
-    function updateChapterGoop(){
-      const st = snap.scrollTop;
-      // nearest chapter
-      let best = 0;
-      let bestDist = Infinity;
-      for (let i=0;i<sections.length;i++){
-        const top = sections[i].offsetTop;
-        const d = Math.abs(top - st);
-        if (d < bestDist){ bestDist = d; best = i; }
-      }
-      const chap = Number(sections[best].dataset.chapter);
-      if (chap !== lastChapter){
-        lastChapter = chap;
-        triggerGoop(650);
-      }
-    }
-
-    snap.addEventListener("scroll", () => {
-      const st = snap.scrollTop;
-      scrollVel = st - lastScrollTop;
-      lastScrollTop = st;
-
-      updateHUD();
-      updateChapterGoop();
-    }, { passive:true });
-
-    // -----------------------------
-    // 3D tilt helper
-    // -----------------------------
+    // 3D tilt
     function addTilt(card){
       const onMove = (ev) => {
         const r = card.getBoundingClientRect();
@@ -936,9 +1107,7 @@
       card.addEventListener("mouseleave", onLeave);
     }
 
-    // -----------------------------
-    // Model (same principle as before)
-    // -----------------------------
+    // Model pieces
     let betEnabled = false;
 
     function pgsiMixAmongGamblers(age, sex){
@@ -1014,16 +1183,13 @@
     function outcomeBand(exp){ return [exp*0.4, exp*2.0]; }
     function fmtGBP0(x){ return "£" + x.toLocaleString(undefined, { maximumFractionDigits: 0 }); }
 
-    // -----------------------------
-    // FIXED visuals
-    // -----------------------------
+    // Visual fixes
     function updateTank(betPerWeek, rate){
       const fill = $("tankFill");
       const leakPath = $("leakPath");
       const leakRateLabel = $("leakRateLabel");
       const betSummary = $("betSummary");
 
-      // If bet/week not enabled, keep clean and consistent
       if (!betEnabled){
         fill.setAttribute("y","140");
         fill.setAttribute("height","0");
@@ -1036,8 +1202,7 @@
       const bet = Math.max(0, betPerWeek || 0);
       const turnover = bet * 52;
 
-      // scale fill to a reasonable max (show saturation, not overflow)
-      const maxBet = 250; // £/wk -> 100% fill
+      const maxBet = 250;
       const pct = clamp(bet / maxBet, 0, 1);
       const h = 120 * pct;
 
@@ -1064,7 +1229,6 @@
       const g = $("sportPipes");
       g.innerHTML = "";
 
-      // build ranked list
       const ranked = SPORT_ORDER
         .map(k => ({ key:k, ...SPORT_RISK[k] }))
         .sort((a,b)=>b.rate-a.rate);
@@ -1102,15 +1266,7 @@
         leak.setAttribute("width", String(290 * t));
         leak.setAttribute("height","14");
         leak.setAttribute("rx","7");
-        leak.setAttribute("fill", s.key === selectedKey ? "rgba(255,255,255,.92)" : "rgba(255,255,255,.65)");
-
-        const drip = document.createElementNS("http://www.w3.org/2000/svg","path");
-        drip.setAttribute("d", `M430 12 C452 18, 460 26, 488 30`);
-        drip.setAttribute("fill","none");
-        drip.setAttribute("stroke", s.key === selectedKey ? "rgba(255,255,255,.92)" : "rgba(255,255,255,.55)");
-        drip.setAttribute("stroke-width", String(3 + t * 10));
-        drip.setAttribute("stroke-linecap","round");
-        drip.setAttribute("opacity", "0.9");
+        leak.setAttribute("fill", s.key === selectedKey ? "rgba(255,255,255,.92)" : "rgba(255,255,255,.62)");
 
         const pct = document.createElementNS("http://www.w3.org/2000/svg","text");
         pct.setAttribute("x","450");
@@ -1123,30 +1279,15 @@
         row.appendChild(label);
         row.appendChild(pipe);
         row.appendChild(leak);
-        row.appendChild(drip);
         row.appendChild(pct);
         g.appendChild(row);
       });
 
       const top = ranked[0];
       $("topRisk").textContent = `Highest leak proxy: ${top.name} (${(top.rate*100).toFixed(1)}%) — ${top.note}`;
+      $("riskExplain").textContent = `Selected: ${SPORT_RISK[selectedKey].name} (${(SPORT_RISK[selectedKey].rate*100).toFixed(1)}%)`;
     }
 
-    // -----------------------------
-    // Banana stat
-    // -----------------------------
-    function bananaStat(expLoss){
-      // Convert expected loss (£) into bananas
-      // bananas = (£ / £/kg) * bananas/kg
-      const bananas = (expLoss / BANANA_PRICE_PER_KG_GBP) * BANANAS_PER_KG;
-      if (!isFinite(bananas) || bananas < 0) return "—";
-      const rounded = Math.max(0, Math.round(bananas));
-      return `${rounded.toLocaleString()} bananas`;
-    }
-
-    // -----------------------------
-    // UI glue
-    // -----------------------------
     function setBetUI(){
       $("betSwitch").classList.toggle("on", betEnabled);
       $("betRow").style.display = betEnabled ? "flex" : "none";
@@ -1158,6 +1299,7 @@
       const sex = $("sex").value;
       const income = Number($("income").value);
       const bet = betEnabled ? Number($("betPerWeek").value || 0) : 0;
+
       const sportKey = $("sportKey").value;
       const rate = SPORT_RISK[sportKey].rate;
 
@@ -1166,9 +1308,7 @@
       updateIncomeViz(income);
       updateTank(bet, rate);
       renderSportPipes(sportKey);
-      $("riskExplain").textContent = `Selected: ${SPORT_RISK[sportKey].name} (${(rate*100).toFixed(1)}%)`;
 
-      // Demographic effect indicator
       if (betEnabled && bet > 0){
         $("demoEffect").textContent = "OFF";
         $("demoEffect2").textContent = "bet/week ON → demographics do not change £";
@@ -1179,7 +1319,6 @@
         $("demoKnob").setAttribute("cx","35");
       }
 
-      // Expected loss
       const mix = pgsiMixAmongGamblers(age, sex);
       let exp, modeLine;
 
@@ -1213,45 +1352,33 @@
         $("pctBar").style.width = "0%";
       }
 
-      $("bananaLine").innerHTML = `You could buy: <span style="font-family:var(--mono); color:rgba(255,255,255,.88)">${bananaStat(exp)}</span> 🍌`;
-
-      // If user changed something, do a tiny goop pulse
-      triggerGoop(260);
-
-      // Update game banner odds whenever sport changes (just cosmetic)
-      updateGameOddsBanner();
+      $("bananaLine").innerHTML = `You could buy: <span style="font-family:var(--mono); color:rgba(255,255,255,.88)">${bananasFromLoss(exp)} bananas</span> 🍌`;
     }
 
-    // -----------------------------
-    // Horse racing simulator (house edge via overround)
-    // -----------------------------
+    // ---------- Horse game (visual upgrade + bookie money) ----------
     let bank = 100;
     let races = 0;
     let totalStaked = 0;
 
-    // These are generated per "session" so the game feels consistent
-    let trueProbs = [0.25, 0.22, 0.20, 0.18, 0.15]; // will be randomized on reset
-    let bookOdds = [3.0, 3.5, 4.0, 4.5, 5.0]; // decimal odds from overround pricing
+    let trueProbs = [0.25, 0.22, 0.20, 0.18, 0.15];
+    let bookOdds  = [3.0, 3.5, 4.0, 4.5, 5.0];
 
     function randDirichlet5(){
-      // quick + dirty: gamma(1) ~ -ln(U)
       const g = Array.from({length:5}, () => -Math.log(Math.max(1e-9, Math.random())));
       const s = g.reduce((a,b)=>a+b,0);
       return g.map(x=>x/s);
     }
 
     function computeBookOdds(overround){
-      // Overround model:
-      // - True probs p_i sum to 1
-      // - Book probs q_i = p_i * overround
-      // - Decimal odds = 1 / q_i
-      // (This is the simplest overround -> negative EV construction.)
       const q = trueProbs.map(p => p * overround);
       return q.map(x => 1 / x);
     }
 
-    function fmtDecOdds(x){
-      return x.toFixed(2) + "x";
+    function fmtDecOdds(x){ return x.toFixed(2) + "x"; }
+
+    function updateGameOddsBanner(){
+      const ov = Number($("overround").value);
+      $("oddsBanner").textContent = `Overround: ${(ov*100).toFixed(0)}%`;
     }
 
     function updateGameOddsUI(){
@@ -1263,13 +1390,7 @@
       updateGameOddsBanner();
     }
 
-    function updateGameOddsBanner(){
-      const ov = Number($("overround").value);
-      $("oddsBanner").textContent = `Overround: ${(ov*100).toFixed(0)}% (book > 100% = house edge)`;
-    }
-
     function chooseWinner(){
-      // sample winner from true probs (not the book)
       const r = Math.random();
       let cum = 0;
       for (let i=0;i<trueProbs.length;i++){
@@ -1281,75 +1402,134 @@
 
     function resetHorses(){
       for (let i=0;i<5;i++){
-        $("h"+i).style.transform = `translateX(0px)`;
+        const h = $("h"+i);
+        h.classList.remove("run");
+        h.style.transform = `translateX(0px)`;
+        h.style.transition = "";
       }
     }
 
-    function runRaceAnimated(pick, stake){
-      // Determine outcome immediately, animate visuals for fun
-      const winner = chooseWinner();
+    function clearMoney(){
+      document.querySelectorAll(".money").forEach(el => el.remove());
+    }
 
-      // Move horses with a slight bias to the winner (without making it obvious)
+    function moneyStream(fromX, fromY, toX, toY, count, ms){
       const track = $("track");
-      const finishX = track.clientWidth - 40 - 110; // finish line minus horse width-ish
-      const base = finishX;
+      const rect = track.getBoundingClientRect();
 
-      const durations = [];
-      for (let i=0;i<5;i++){
-        const noise = (Math.random() * 0.22) + 0.95;
-        const winBoost = (i === winner) ? 0.86 : 1.0;
-        durations[i] = 1100 * noise * winBoost;
+      for (let i=0;i<count;i++){
+        const m = document.createElement("div");
+        m.className = "money";
+        track.appendChild(m);
+
+        const sx = fromX - rect.left + (Math.random()*10 - 5);
+        const sy = fromY - rect.top  + (Math.random()*10 - 5);
+        const tx = toX   - rect.left + (Math.random()*16 - 8);
+        const ty = toY   - rect.top  + (Math.random()*16 - 8);
+
+        const delay = i * (ms / count) * 0.18;
+
+        m.style.left = sx + "px";
+        m.style.top  = sy + "px";
+        m.style.opacity = "0";
+
+        requestAnimationFrame(() => {
+          m.style.transition =
+            `transform ${ms}ms cubic-bezier(.2,.9,.2,1) ${delay}ms, opacity 180ms ease ${delay}ms`;
+          m.style.opacity = "0.95";
+          m.style.transform = `translate(${(tx - sx).toFixed(0)}px, ${(ty - sy).toFixed(0)}px)`;
+        });
+
+        // fade out near end
+        setTimeout(() => {
+          m.style.transition = `opacity 220ms ease`;
+          m.style.opacity = "0";
+        }, delay + ms - 220);
+
+        setTimeout(() => m.remove(), delay + ms + 260);
       }
-
-      // Apply transforms with transitions
-      for (let i=0;i<5;i++){
-        const h = $("h"+i);
-        h.style.transition = `transform ${durations[i].toFixed(0)}ms cubic-bezier(.2,.8,.2,1)`;
-        h.style.transform = `translateX(${base}px)`;
-      }
-
-      // Settle payout after the slowest finishes
-      const settleIn = Math.max(...durations) + 40;
-      setTimeout(() => {
-        // remove transitions
-        for (let i=0;i<5;i++){
-          $("h"+i).style.transition = "";
-        }
-        settleBet(pick, stake, winner);
-        // reset positions (with tiny delay so it doesn't feel glitchy)
-        setTimeout(resetHorses, 420);
-      }, settleIn);
     }
 
     function settleBet(pick, stake, winner){
       races += 1;
       totalStaked += stake;
-
-      // stake leaves bankroll
       bank -= stake;
 
       let payout = 0;
-      if (pick === winner){
-        // decimal odds include stake in return in real-world; for clarity we’ll pay PROFIT only:
-        // profit = stake*(odds-1)
+      const win = (pick === winner);
+      if (win){
         payout = stake * (bookOdds[winner] - 1);
-        bank += stake + payout; // return stake + profit
+        bank += stake + payout;
       }
 
-      // UI
       $("bank").textContent = "£" + bank.toFixed(2);
       $("races").textContent = String(races);
 
       const roi = totalStaked > 0 ? ((bank - 100) / totalStaked) * 100 : 0;
       $("roi").textContent = roi.toFixed(2) + "%";
 
-      $("lastResult").textContent = pick === winner
+      $("lastResult").textContent = win
         ? `Last: WIN (Horse ${winner+1}) +£${payout.toFixed(2)}`
         : `Last: LOSS (Horse ${winner+1})`;
+
+      // bookie animation + money
+      const bookie = $("bookie");
+      bookie.classList.remove("pay","take");
+      void bookie.offsetWidth; // restart CSS animation
+
+      const track = $("track").getBoundingClientRect();
+      const bookieRect = bookie.getBoundingClientRect();
+
+      // “player bank” target: use the bankroll text (approx)
+      const bankRect = $("bank").getBoundingClientRect();
+
+      if (win){
+        bookie.classList.add("pay");
+        moneyStream(
+          bookieRect.left + 40, bookieRect.top + 120,
+          bankRect.left + 20, bankRect.top + 10,
+          14, 650
+        );
+      } else {
+        bookie.classList.add("take");
+        moneyStream(
+          bankRect.left + 20, bankRect.top + 10,
+          bookieRect.left + 40, bookieRect.top + 140,
+          10, 520
+        );
+      }
+    }
+
+    function runRaceAnimated(pick, stake){
+      clearMoney();
+
+      const winner = chooseWinner();
+      const track = $("track");
+      const finishX = track.clientWidth - 150 - 160; // finish line offset minus horse width-ish
+      const base = Math.max(120, finishX);
+
+      const durations = [];
+      for (let i=0;i<5;i++){
+        const noise = (Math.random() * 0.25) + 0.95;
+        const winBoost = (i === winner) ? 0.86 : 1.0;
+        durations[i] = 1300 * noise * winBoost;
+      }
+
+      for (let i=0;i<5;i++){
+        const h = $("h"+i);
+        h.classList.add("run");
+        h.style.transition = `transform ${durations[i].toFixed(0)}ms cubic-bezier(.2,.85,.2,1)`;
+        h.style.transform = `translateX(${base}px)`;
+      }
+
+      const settleIn = Math.max(...durations) + 40;
+      setTimeout(() => {
+        settleBet(pick, stake, winner);
+        setTimeout(resetHorses, 520);
+      }, settleIn);
     }
 
     function runSim(n){
-      // Fast, no animation: demonstrates EV.
       const pick = Number($("pickHorse").value);
       const stake = Math.max(1, Number($("stake").value || 1));
 
@@ -1369,7 +1549,7 @@
       const roi = totalStaked > 0 ? ((bank - 100) / totalStaked) * 100 : 0;
       $("roi").textContent = roi.toFixed(2) + "%";
       $("lastResult").textContent = `Last: simulated ${n.toLocaleString()} races`;
-      triggerGoop(380);
+      clearMoney();
     }
 
     function resetGame(){
@@ -1377,9 +1557,7 @@
       races = 0;
       totalStaked = 0;
 
-      // new “true” race each reset
-      trueProbs = randDirichlet5().map(p => 0.06 + 0.94*p); // avoid absurd tiny
-      // normalize again
+      trueProbs = randDirichlet5().map(p => 0.06 + 0.94*p);
       const s = trueProbs.reduce((a,b)=>a+b,0);
       trueProbs = trueProbs.map(x=>x/s);
 
@@ -1390,58 +1568,49 @@
       $("races").textContent = "0";
       $("roi").textContent = "0.00%";
       $("lastResult").textContent = "Last: —";
+
       updateGameOddsUI();
+      clearMoney();
       resetHorses();
-      triggerGoop(520);
     }
 
     function updateOverround(){
       const ov = Number($("overround").value);
       bookOdds = computeBookOdds(ov);
       updateGameOddsUI();
-      triggerGoop(260);
     }
 
-    // -----------------------------
     // Wire UI
-    // -----------------------------
-    addTilt($("cBet")); addTilt($("vBet"));
-    addTilt($("cIncome")); addTilt($("vIncome"));
-    addTilt($("cDemo")); addTilt($("vDemo"));
-    addTilt($("cResult")); addTilt($("cSports"));
-    addTilt($("cGame")); addTilt($("cOutro"));
+    ["cBet","vBet","cIncome","vIncome","cDemo","vDemo","cResult","cSports","cGame","cOutro"]
+      .map($)
+      .forEach(addTilt);
 
     $("betSwitch").addEventListener("click", () => {
       betEnabled = !betEnabled;
       setBetUI();
       recalc();
     });
-
     $("betPerWeek").addEventListener("input", recalc);
     $("sportKey").addEventListener("change", recalc);
     $("income").addEventListener("input", recalc);
     $("age").addEventListener("input", recalc);
     $("sex").addEventListener("change", recalc);
 
-    // game
     $("raceBtn").addEventListener("click", () => {
       const pick = Number($("pickHorse").value);
       const stake = Math.max(1, Number($("stake").value || 1));
       runRaceAnimated(pick, stake);
-      triggerGoop(420);
     });
     $("sim1kBtn").addEventListener("click", () => runSim(1000));
     $("sim10kBtn").addEventListener("click", () => runSim(10000));
     $("resetBankBtn").addEventListener("click", resetGame);
-    $("overround").addEventListener("change", () => { updateOverround(); });
+    $("overround").addEventListener("change", updateOverround);
 
-    // init
+    // Init
+    updateHUD();
     setBetUI();
     recalc();
-    updateHUD();
-    updateGameOddsBanner();
     resetGame();
-    requestAnimationFrame(animateGoop);
   </script>
 </body>
 </html>
