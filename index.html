@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Expected Gambling Loss — Story Mode</title>
+  <title>Expected Gambling Loss — Story + Goop + Simulator</title>
 
   <style>
     :root{
@@ -12,18 +12,19 @@
       --muted:rgba(255,255,255,.58);
       --muted2:rgba(255,255,255,.40);
       --line:rgba(255,255,255,.10);
-      --panel:rgba(10,10,10,.70);
+      --panel:rgba(10,10,10,.72);
       --shadow: 0 24px 70px rgba(0,0,0,.75);
       --r:18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
     }
-
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     body{
       margin:0;
       background:var(--bg);
       color:var(--fg);
-      font: 14px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      font: 14px/1.45 var(--sans);
       letter-spacing:.12px;
       overflow-x:hidden;
     }
@@ -46,13 +47,15 @@
       transform-style:preserve-3d;
     }
 
+    /* Story / scroll */
     .snap{
       height:100vh;
       overflow-y:auto;
       scroll-snap-type: y mandatory;
       scroll-behavior:smooth;
+      position:relative;
+      z-index:2;
     }
-
     section{
       min-height:100vh;
       scroll-snap-align:start;
@@ -64,17 +67,39 @@
       transform-style:preserve-3d;
     }
 
-    .wrap{
-      width:min(1040px, 100%);
-      display:grid;
-      grid-template-columns: 420px 1fr;
-      gap: 14px;
-      align-items:start;
+    /* HUD */
+    .hud{
+      position:fixed;
+      top:14px;
+      left:50%;
+      transform: translateX(-50%);
+      z-index:5;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding: 10px 12px;
+      border:1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(8px);
     }
-    @media (max-width: 960px){
-      .wrap{ grid-template-columns: 1fr; }
+    .hud .dot{ width:8px; height:8px; border-radius:999px; background:rgba(255,255,255,.8); }
+    .hud .t{ font: 12px/1 var(--mono); color: var(--muted); }
+    .hud .bar{
+      width: 140px; height: 8px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      border-radius:999px;
+      overflow:hidden;
+    }
+    .hud .bar i{
+      display:block; height:100%;
+      width: 0%;
+      background: rgba(255,255,255,.82);
+      transition: width .25s ease;
     }
 
+    /* Layout blocks */
     .hero{
       width:min(980px, 100%);
       transform: translateZ(40px);
@@ -96,52 +121,9 @@
     .sub{
       margin-top: 10px;
       color:var(--muted);
-      max-width: 80ch;
+      max-width: 82ch;
       font-size: 13px;
     }
-
-    .card{
-      border:1px solid var(--line);
-      border-radius: var(--r);
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      position:relative;
-      transform-style:preserve-3d;
-    }
-    .inner{ padding: 16px; }
-
-    .title{
-      margin:0 0 12px;
-      color:var(--muted);
-      font-weight: 800;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      font-size: 11px;
-    }
-
-    label{ color:var(--muted); }
-    .row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin: 10px 0;
-    }
-
-    input[type="range"]{ width:100%; }
-    input[type="number"], select{
-      width: 180px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.55);
-      color:var(--fg);
-      outline:none;
-    }
-
-    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
-
     .pill{
       display:inline-flex;
       gap:10px;
@@ -154,11 +136,63 @@
       font-size: 12px;
       white-space: nowrap;
       margin-top: 10px;
+      font-family: var(--mono);
     }
-    .dot{
+    .pill .pDot{
       width:8px; height:8px; border-radius:999px;
       background: rgba(255,255,255,.78);
       box-shadow: 0 0 0 5px rgba(255,255,255,.08);
+    }
+
+    .wrap{
+      width:min(1040px, 100%);
+      display:grid;
+      grid-template-columns: 420px 1fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 960px){
+      .wrap{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      border:1px solid var(--line);
+      border-radius: var(--r);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+      transform-style:preserve-3d;
+    }
+    .inner{ padding: 16px; }
+    .title{
+      margin:0 0 12px;
+      color:var(--muted);
+      font-weight: 800;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      font-size: 11px;
+      font-family: var(--sans);
+    }
+
+    label{ color:var(--muted); }
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin: 10px 0;
+    }
+    input[type="range"]{ width:100%; }
+    input[type="number"], select{
+      width: 190px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.55);
+      color:var(--fg);
+      outline:none;
+      font-family: var(--mono);
     }
 
     .toggle{
@@ -183,12 +217,13 @@
       letter-spacing:.10em;
       text-transform:uppercase;
       color: var(--muted);
+      font-family: var(--sans);
     }
     .toggle .left span{
       color: var(--muted2);
       font-size: 12px;
+      font-family: var(--sans);
     }
-
     .switch{
       position:relative;
       width: 54px;
@@ -226,9 +261,9 @@
       border-radius: 16px;
       padding: 12px;
     }
-    .stat .k{ color:var(--muted); font-size: 12px; }
-    .stat .v{ font-size: 24px; font-weight: 900; margin-top: 2px; letter-spacing:.2px; }
-    .stat .s{ color:var(--muted2); font-size: 12px; margin-top: 4px; }
+    .stat .k{ color:var(--muted); font-size: 12px; font-family: var(--sans); }
+    .stat .v{ font-size: 24px; font-weight: 900; margin-top: 2px; letter-spacing:.2px; font-family: var(--mono); }
+    .stat .s{ color:var(--muted2); font-size: 12px; margin-top: 4px; font-family: var(--mono); }
 
     .bar{
       height: 10px;
@@ -251,15 +286,9 @@
       font-size: 12px;
       margin-top: 12px;
       line-height:1.55;
+      font-family: var(--sans);
     }
 
-    /* story staging */
-    .stageText{
-      position:relative;
-      transform: translateZ(34px);
-    }
-
-    /* simple “illustration” panel */
     .viz{
       border:1px solid rgba(255,255,255,.08);
       border-radius: 16px;
@@ -269,7 +298,7 @@
       overflow:hidden;
     }
 
-    /* scroll hint */
+    /* Scroll hint */
     .scrollHint{
       position:absolute;
       left:50%;
@@ -284,6 +313,7 @@
       gap:10px;
       user-select:none;
       pointer-events:none;
+      font-family: var(--sans);
     }
     .scrollHint i{
       display:inline-block;
@@ -309,35 +339,176 @@
       100%{ opacity:.55; }
     }
 
-    /* 3D tilt (applied via JS) */
+    /* 3D tilt */
     .tilt{ transform: rotateX(0) rotateY(0) translateZ(0); will-change: transform; }
+
+    /* GOOP OVERLAY (metaballs + goo filter) */
+    .goop{
+      position:fixed;
+      inset:0;
+      z-index:4;
+      pointer-events:none;
+      opacity:0;
+      transition: opacity .22s ease;
+      mix-blend-mode: screen;
+    }
+    .goop.on{ opacity:1; }
+    .goop svg{ width:100%; height:100%; display:block; }
+
+    /* Horse game */
+    .gameRow{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .gameControls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      padding: 12px;
+      background: rgba(0,0,0,.40);
+    }
+    .gameControls .left, .gameControls .right{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .btn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      color: rgba(255,255,255,.85);
+      border-radius: 999px;
+      padding: 10px 12px;
+      cursor:pointer;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .btn:hover{ background: rgba(255,255,255,.08); }
+
+    .track{
+      position:relative;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      background: rgba(0,0,0,.40);
+      height: 210px;
+      overflow:hidden;
+    }
+    .lane{
+      position:absolute;
+      left:0; right:0;
+      height: 42px;
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    .horse{
+      position:absolute;
+      left: 10px;
+      width: 90px;
+      height: 28px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 0 10px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(255,255,255,.82);
+      will-change: transform;
+    }
+    .finish{
+      position:absolute;
+      top:0; bottom:0;
+      right: 40px;
+      width: 2px;
+      background: rgba(255,255,255,.28);
+    }
+    .flag{
+      position:absolute;
+      top: 12px;
+      right: 12px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(255,255,255,.60);
+    }
+    .bank{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      font-family: var(--mono);
+      color: rgba(255,255,255,.70);
+      font-size: 12px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 
 <body>
+  <!-- GOOP overlay -->
+  <div class="goop" id="goop">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <!-- Classic SVG goo (blur + threshold) -->
+        <filter id="goo">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
+          <feColorMatrix in="blur" mode="matrix"
+            values="
+              1 0 0 0 0
+              0 1 0 0 0
+              0 0 1 0 0
+              0 0 0 22 -10" result="goo" />
+          <feComposite in="goo" in2="SourceGraphic" operator="atop"/>
+        </filter>
+      </defs>
+
+      <g filter="url(#goo)" id="goopGroup" opacity="0.95">
+        <!-- circles are updated by JS -->
+        <circle cx="20" cy="50" r="10" fill="white"></circle>
+        <circle cx="35" cy="52" r="12" fill="white"></circle>
+        <circle cx="52" cy="48" r="11" fill="white"></circle>
+        <circle cx="68" cy="50" r="9"  fill="white"></circle>
+        <circle cx="82" cy="52" r="13" fill="white"></circle>
+      </g>
+    </svg>
+  </div>
+
+  <!-- HUD -->
+  <div class="hud" aria-hidden="true">
+    <span class="dot"></span>
+    <span class="t" id="hudText">CHAPTER 1 / 6</span>
+    <span class="bar"><i id="hudBar"></i></span>
+  </div>
+
   <div class="scene">
     <div class="snap" id="snap">
 
-      <!-- CHAPTER 1 -->
-      <section>
-        <div class="hero stageText">
+      <!-- 1: Intro -->
+      <section data-chapter="1">
+        <div class="hero">
           <div class="kicker">Story mode • scroll to progress</div>
-          <h1>Your money, in leaks.</h1>
+          <h1>Money doesn’t vanish.<br/>It leaks.</h1>
           <div class="sub">
-            This is expected value, not a fortune teller. We’ll build the estimate step-by-step.
-            If you enter <span class="mono">bet/week</span>, the £ result is driven by the wager maths, not age or gender.
+            You’ll feed the model in stages. If you provide <span style="font-family:var(--mono)">bet/week</span>, the £ result is driven by wager maths — not age or gender.
           </div>
-          <div class="pill mono"><span class="dot"></span> ASSUMPTION: gambles this year</div>
+          <div class="pill"><span class="pDot"></span> ASSUMPTION: gambles this year</div>
         </div>
         <div class="scrollHint"><i></i> scroll</div>
       </section>
 
-      <!-- CHAPTER 2: Bet/week -->
-      <section>
+      <!-- 2: Bet/week -->
+      <section data-chapter="2">
         <div class="wrap">
           <div class="card tilt" id="cBet">
             <div class="inner">
-              <div class="title">Stage 1 — What do you stake?</div>
+              <div class="title">Stage 1 — How much do you stake?</div>
 
               <div class="toggle">
                 <div class="left">
@@ -353,81 +524,71 @@
               </div>
 
               <div class="row" style="margin-top:12px;">
-                <label for="edgePreset">Game type</label>
-                <select id="edgePreset">
-                  <option value="0.078">Soccer-like (≈7.8%)</option>
-                  <option value="0.075">Tennis-like (≈7.5%)</option>
-                  <option value="0.120">Racing-like (≈12%)</option>
-                  <option value="0.260">Greyhound-like (≈26%)</option>
+                <label for="sportKey">Bet type</label>
+                <select id="sportKey" aria-label="Loss-rate preset">
+                  <option value="soccer">Soccer-like</option>
+                  <option value="tennis">Tennis-like</option>
+                  <option value="racing">Horse-racing-like</option>
+                  <option value="greyhound">Greyhound-like</option>
                 </select>
               </div>
 
               <div class="note">
-                The “game type” is an expected loss rate. It’s a proxy for margin/overround differences across markets.
+                This “bet type” is a long-run expected loss rate proxy (bookmaker margin / realized loss rate).
               </div>
             </div>
           </div>
 
           <div class="card tilt" id="vBet">
             <div class="inner">
-              <div class="title">Visual</div>
+              <div class="title">Turnover</div>
               <div class="viz">
-                <!-- simple leak tank -->
-                <svg viewBox="0 0 520 180" width="100%" height="180" aria-label="Leak tank">
+                <svg viewBox="0 0 520 180" width="100%" height="180" aria-label="Turnover tank">
                   <rect x="18" y="20" width="300" height="120" rx="18" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="2"/>
                   <rect x="18" y="20" width="300" height="120" rx="18" fill="rgba(255,255,255,.05)"/>
                   <text x="28" y="54" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">TURNOVER</text>
 
-                  <!-- fill based on bet/week -->
                   <clipPath id="tankClip"><rect x="18" y="20" width="300" height="120" rx="18"/></clipPath>
                   <rect id="tankFill" x="18" y="140" width="300" height="0" fill="rgba(255,255,255,.75)" clip-path="url(#tankClip)"/>
 
-                  <!-- leak pipe -->
                   <rect x="340" y="68" width="90" height="20" rx="10" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.22)"/>
                   <circle cx="338" cy="78" r="12" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.22)"/>
 
-                  <!-- leak stream -->
                   <path id="leakPath" d="M430 78 C460 90, 470 110, 492 132" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-linecap="round" opacity="0.0"/>
                   <text x="340" y="52" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">LEAK RATE</text>
-
                   <text id="leakRateLabel" x="340" y="112" fill="rgba(255,255,255,.85)" font-size="14" font-family="ui-monospace, monospace">—</text>
                 </svg>
               </div>
 
-              <div class="note mono" id="betSummary">Enter bet/week to see the tank fill.</div>
+              <div class="note" style="font-family:var(--mono)" id="betSummary">Toggle bet/week to see turnover fill.</div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- CHAPTER 3: Income -->
-      <section>
+      <!-- 3: Income -->
+      <section data-chapter="3">
         <div class="wrap">
           <div class="card tilt" id="cIncome">
             <div class="inner">
-              <div class="title">Stage 2 — What can you afford?</div>
+              <div class="title">Stage 2 — Disposable income</div>
               <div class="row">
                 <label for="income">Disposable income (£/year)</label>
                 <input id="income" type="number" min="0" step="50" value="20000" />
               </div>
-
-              <div class="note">
-                Low-income guardrails prevent absurd outputs when income is tiny.
-              </div>
+              <div class="note">Guardrails prevent absurd outputs when income is tiny.</div>
             </div>
           </div>
 
           <div class="card tilt" id="vIncome">
             <div class="inner">
-              <div class="title">Visual</div>
+              <div class="title">Budget rail</div>
               <div class="viz">
-                <!-- “budget rail” -->
                 <svg viewBox="0 0 520 180" width="100%" height="180" aria-label="Budget rail">
                   <text x="18" y="32" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">DISPOSABLE INCOME</text>
                   <rect x="18" y="56" width="484" height="16" rx="8" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.12)"/>
                   <rect id="incomeBar" x="18" y="56" width="0" height="16" rx="8" fill="rgba(255,255,255,.75)"/>
                   <text id="incomeLabel" x="18" y="104" fill="rgba(255,255,255,.85)" font-size="16" font-family="ui-monospace, monospace">—</text>
-
                   <text x="18" y="136" fill="rgba(255,255,255,.45)" font-size="12" font-family="ui-monospace, monospace">
                     (scaled to £0 → £50k for display)
                   </text>
@@ -438,8 +599,8 @@
         </div>
       </section>
 
-      <!-- CHAPTER 4: Demographics (only influences when bet/week OFF) -->
-      <section>
+      <!-- 4: Demographics -->
+      <section data-chapter="4">
         <div class="wrap">
           <div class="card tilt" id="cDemo">
             <div class="inner">
@@ -447,7 +608,7 @@
 
               <div class="row">
                 <label for="age">Age</label>
-                <div class="mono" id="ageVal">30</div>
+                <div style="font-family:var(--mono)" id="ageVal">30</div>
               </div>
               <input id="age" type="range" min="18" max="90" value="30" />
 
@@ -467,15 +628,14 @@
 
           <div class="card tilt" id="vDemo">
             <div class="inner">
-              <div class="title">Visual</div>
+              <div class="title">Impact switch</div>
               <div class="viz">
                 <svg viewBox="0 0 520 180" width="100%" height="180" aria-label="Demographic effect">
                   <text x="18" y="32" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">EFFECT ON £ OUTCOME</text>
                   <text id="demoEffect" x="18" y="72" fill="rgba(255,255,255,.88)" font-size="22" font-family="ui-monospace, monospace">—</text>
                   <text id="demoEffect2" x="18" y="102" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">—</text>
 
-                  <!-- little “switch” diagram -->
-                  <rect x="18" y="126" width="260" height="34" rx="17" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.12)"/>
+                  <rect x="18" y="126" width="300" height="34" rx="17" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.12)"/>
                   <circle id="demoKnob" cx="35" cy="143" r="12" fill="rgba(255,255,255,.85)"/>
                   <text x="64" y="148" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">
                     bet/week OFF → demographics ON
@@ -487,8 +647,8 @@
         </div>
       </section>
 
-      <!-- CHAPTER 5: Result + Sports Risk -->
-      <section>
+      <!-- 5: Result + Leak map + bananas -->
+      <section data-chapter="5">
         <div class="wrap">
           <div class="card tilt" id="cResult">
             <div class="inner">
@@ -497,22 +657,27 @@
               <div class="split">
                 <div class="stat">
                   <div class="k">Expected annual net loss</div>
-                  <div class="v mono" id="expLoss">—</div>
-                  <div class="s mono" id="band">—</div>
+                  <div class="v" id="expLoss">—</div>
+                  <div class="s" id="band">—</div>
                   <div class="bar"><i id="posBar"></i></div>
                 </div>
 
                 <div class="stat">
                   <div class="k">Loss as % of income</div>
-                  <div class="v mono" id="pctIncome">—</div>
-                  <div class="s mono" id="modeLine">—</div>
+                  <div class="v" id="pctIncome">—</div>
+                  <div class="s" id="modeLine">—</div>
                   <div class="bar"><i id="pctBar"></i></div>
                 </div>
               </div>
 
-              <div class="note mono" id="capLine">CAPS: —</div>
+              <div class="note" style="font-family:var(--mono)" id="capLine">CAPS: —</div>
+
+              <div class="note" id="bananaLine">
+                You could buy: —
+              </div>
+
               <div class="note">
-                If bet/week is ON, the loss is driven by <span class="mono">lossRate × turnover</span> (no “age/gender luck”).
+                Fun fact math uses an ONS banana price per kg and a rough “bananas per kg” assumption.
               </div>
             </div>
           </div>
@@ -521,27 +686,100 @@
             <div class="inner">
               <div class="title">Where you’re most likely to leak money</div>
               <div class="note" style="margin-top:-4px;">
-                These are rough, evidence-anchored “loss rate” proxies (bookmaker margin / realized loss rates). Higher = worse value on average.
+                “Leak size” = long-run expected loss proxy. Higher means worse value on average.
               </div>
 
               <div class="viz">
-                <!-- Leak Map: pipes with leak thickness -->
-                <svg viewBox="0 0 520 220" width="100%" height="220" aria-label="Sports leak map">
-                  <text x="18" y="30" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">LEAK MAP (higher % = bigger leak)</text>
-
-                  <!-- Pipe rows -->
-                  <g id="sportPipes" transform="translate(18,52)">
-                    <!-- generated by JS -->
-                  </g>
-
+                <svg viewBox="0 0 520 220" width="100%" height="220" aria-label="Leak map">
+                  <text x="18" y="30" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">LEAK MAP</text>
+                  <g id="sportPipes" transform="translate(18,52)"></g>
                   <text id="riskExplain" x="18" y="206" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">—</text>
                 </svg>
               </div>
 
-              <div class="note mono" id="topRisk">—</div>
-              <div class="note">
-                Tip: “Greyhound-like” markets tend to have much fatter books than major-match soccer/tennis.
+              <div class="note" style="font-family:var(--mono)" id="topRisk">—</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6: Horse race simulator -->
+      <section data-chapter="6">
+        <div class="wrap">
+          <div class="card tilt" id="cGame">
+            <div class="inner">
+              <div class="title">Bonus — Horse racing simulator</div>
+              <div class="note" style="margin-top:-4px;">
+                A tiny game that demonstrates “house advantage” via <span style="font-family:var(--mono)">overround</span> (book > 100%).
               </div>
+
+              <div class="gameRow">
+                <div class="gameControls">
+                  <div class="left">
+                    <label style="font-family:var(--sans)">Pick</label>
+                    <select id="pickHorse" style="width:160px;">
+                      <option value="0">Horse 1</option>
+                      <option value="1">Horse 2</option>
+                      <option value="2">Horse 3</option>
+                      <option value="3">Horse 4</option>
+                      <option value="4">Horse 5</option>
+                    </select>
+
+                    <label style="font-family:var(--sans)">Stake (£)</label>
+                    <input id="stake" type="number" min="1" step="1" value="5" style="width:110px;" />
+
+                    <label style="font-family:var(--sans)">Overround</label>
+                    <select id="overround" style="width:140px;">
+                      <option value="1.05">105% (tight)</option>
+                      <option value="1.12" selected>112% (typical-ish)</option>
+                      <option value="1.20">120% (fat book)</option>
+                    </select>
+                  </div>
+
+                  <div class="right">
+                    <button class="btn" id="raceBtn">Run 1 race</button>
+                    <button class="btn" id="sim1kBtn">Run 1,000</button>
+                    <button class="btn" id="sim10kBtn">Run 10,000</button>
+                    <button class="btn" id="resetBankBtn">Reset</button>
+                  </div>
+                </div>
+
+                <div class="track" id="track">
+                  <div class="finish"></div>
+                  <div class="flag" id="oddsBanner">Odds: —</div>
+                  <div class="lane" style="top:42px;"></div>
+                  <div class="lane" style="top:84px;"></div>
+                  <div class="lane" style="top:126px;"></div>
+                  <div class="lane" style="top:168px;"></div>
+
+                  <div class="horse" id="h0" style="top:12px;"><span>H1</span><span id="o0">—</span></div>
+                  <div class="horse" id="h1" style="top:54px;"><span>H2</span><span id="o1">—</span></div>
+                  <div class="horse" id="h2" style="top:96px;"><span>H3</span><span id="o2">—</span></div>
+                  <div class="horse" id="h3" style="top:138px;"><span>H4</span><span id="o3">—</span></div>
+                  <div class="horse" id="h4" style="top:180px;"><span>H5</span><span id="o4">—</span></div>
+                </div>
+
+                <div class="bank">
+                  <div>Bankroll: <span id="bank" style="color:rgba(255,255,255,.9)">£100</span></div>
+                  <div>Races: <span id="races">0</span></div>
+                  <div>ROI: <span id="roi">0.00%</span></div>
+                  <div id="lastResult">Last: —</div>
+                </div>
+
+                <div class="note">
+                  This is a simplified model: we generate “true” win probabilities, then create bookmaker odds by applying overround (so expected value is negative).
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card tilt" id="cOutro">
+            <div class="inner">
+              <div class="title">That’s the point</div>
+              <div class="sub" style="margin-top:0;">
+                Over a big enough sample, the maths wins.
+              </div>
+              <div class="pill"><span class="pDot"></span> back to the top and try different inputs</div>
             </div>
           </div>
         </div>
@@ -551,24 +789,21 @@
   </div>
 
   <script>
-    // --------------------
-    // Core principle:
-    // If bet/week is ON and bet/week > 0, the £ outcome is behavior-driven:
-    //   expectedLoss = lossRate * (bet/week * 52)
-    // Demographics should not move that number.
-    //
-    // If bet/week is OFF, we fall back to demographic risk-mix + income scaling (with caps).
-    // --------------------
+    // -----------------------------
+    // SOURCES / ASSUMPTIONS (kept simple in code)
+    // -----------------------------
+    // Banana price: ONS RPI "Ave price - Bananas, per Kg" shows ~102 pence per kg in the latest visible monthly row on the page snapshot.
+    // We'll use £1.02/kg as a "fun" calculation baseline and say it's a rough, not exact.
+    const BANANA_PRICE_PER_KG_GBP = 1.02;
+    const BANANAS_PER_KG = 8; // assumption: ~125g each incl. peel-ish
 
-    // Open-banking anchored annual losses by PGSI group (fallback mode only)
+    // Demographic fallback anchors (open-banking style, used only when bet/week is OFF)
     const LOSS_PGSI0   = 196.95;
     const LOSS_PGSI1_4 = 955.21;
     const LOSS_PGSI5P  = 2506.91;
-
     const AT_RISK_LOSS_PCT_INCOME   = 0.023;
     const HIGH_RISK_LOSS_PCT_INCOME = 0.059;
 
-    // PGSI mix among gamblers by sex (fallback mode only)
     const PGSI_BY_SEX = {
       male:   { low_1_2: 0.165, mod_3_7: 0.066, prob_8p: 0.060 },
       female: { low_1_2: 0.130, mod_3_7: 0.039, prob_8p: 0.028 },
@@ -576,22 +811,136 @@
     const YOUNG_MULT = 2.27;
     const OLD_MULT   = 0.11;
 
-    // Evidence-anchored sport “loss rate” presets (used when bet/week ON)
-    // Soccer/Tennis from realized loss rates in Hegarty (losses > overround prediction).
-    // Greyhound overround typical ~126% (≈26%).
-    // Racing-like 12% as a conservative mid value (race books vary with field size).
-    const SPORT_RISK = [
-      { key:"soccer",    name:"Soccer",    rate:0.078, note:"realized avg loss ~7.8%" },
-      { key:"tennis",    name:"Tennis",    rate:0.075, note:"realized avg loss ~7.5%" },
-      { key:"racing",    name:"Racing",    rate:0.120, note:"example ‘fatter’ books" },
-      { key:"greyhound", name:"Greyhound", rate:0.260, note:"typical book ~126% (~26%)" },
-    ];
+    // Sports leak presets (keyed -> fixes the old float equality bug)
+    const SPORT_RISK = {
+      soccer:    { name:"Soccer",    rate:0.078, note:"~7.8% leak proxy" },
+      tennis:    { name:"Tennis",    rate:0.075, note:"~7.5% leak proxy" },
+      racing:    { name:"Racing",    rate:0.120, note:"fatter books vary" },
+      greyhound: { name:"Greyhound", rate:0.260, note:"very fat books" },
+    };
+    const SPORT_ORDER = ["greyhound","racing","soccer","tennis"]; // high->low-ish
 
     const $ = (id) => document.getElementById(id);
     const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
-    const lerp = (a,b,t) => a + (b-a) * t;
+    const lerp = (a,b,t) => a + (b-a)*t;
 
-    // --- fallback demographic mix ---
+    // -----------------------------
+    // GOOP (metaballs) tied to scroll
+    // -----------------------------
+    const goop = $("goop");
+    const goopGroup = $("goopGroup");
+    const goopCircles = Array.from(goopGroup.querySelectorAll("circle"));
+    let goopActiveUntil = 0;
+
+    function triggerGoop(ms=520){
+      goopActiveUntil = Math.max(goopActiveUntil, performance.now() + ms);
+      goop.classList.add("on");
+    }
+
+    function animateGoop(t){
+      // if not active, fade out
+      if (t > goopActiveUntil){
+        goop.classList.remove("on");
+      }
+
+      // metaball motion: smooth + “sling” across screen
+      const w = 100, h = 100;
+      const baseY = 50 + Math.sin(t/900)*6;
+      const driftX = (Math.sin(t/700)*10) + 50;
+
+      // shove based on scroll velocity (stored globally)
+      const shove = clamp(scrollVel*2.2, -18, 18);
+
+      for (let i=0;i<goopCircles.length;i++){
+        const c = goopCircles[i];
+        const phase = (i+1)*0.9;
+        const cx = clamp(driftX + Math.sin(t/380 + phase)*18 + shove, 8, 92);
+        const cy = clamp(baseY + Math.cos(t/420 + phase)*14, 10, 90);
+        const r  = 9 + (i%3)*2 + (Math.sin(t/500 + phase)*1.5);
+        c.setAttribute("cx", cx.toFixed(2));
+        c.setAttribute("cy", cy.toFixed(2));
+        c.setAttribute("r",  r.toFixed(2));
+      }
+
+      requestAnimationFrame(animateGoop);
+    }
+
+    // -----------------------------
+    // Story + HUD + chapter detection
+    // -----------------------------
+    const snap = $("snap");
+    const sections = Array.from(document.querySelectorAll("section[data-chapter]"));
+    const hudText = $("hudText");
+    const hudBar  = $("hudBar");
+
+    let lastScrollTop = 0;
+    let scrollVel = 0;
+
+    function updateHUD(){
+      const st = snap.scrollTop;
+      const max = Math.max(1, snap.scrollHeight - snap.clientHeight);
+      const pct = clamp(st / max, 0, 1);
+      hudBar.style.width = (pct*100).toFixed(1) + "%";
+
+      // chapter: pick nearest section top
+      let best = 0;
+      let bestDist = Infinity;
+      for (let i=0;i<sections.length;i++){
+        const top = sections[i].offsetTop;
+        const d = Math.abs(top - st);
+        if (d < bestDist){ bestDist = d; best = i; }
+      }
+      hudText.textContent = `CHAPTER ${best+1} / ${sections.length}`;
+    }
+
+    // Trigger goop on snap transitions
+    let lastChapter = 1;
+    function updateChapterGoop(){
+      const st = snap.scrollTop;
+      // nearest chapter
+      let best = 0;
+      let bestDist = Infinity;
+      for (let i=0;i<sections.length;i++){
+        const top = sections[i].offsetTop;
+        const d = Math.abs(top - st);
+        if (d < bestDist){ bestDist = d; best = i; }
+      }
+      const chap = Number(sections[best].dataset.chapter);
+      if (chap !== lastChapter){
+        lastChapter = chap;
+        triggerGoop(650);
+      }
+    }
+
+    snap.addEventListener("scroll", () => {
+      const st = snap.scrollTop;
+      scrollVel = st - lastScrollTop;
+      lastScrollTop = st;
+
+      updateHUD();
+      updateChapterGoop();
+    }, { passive:true });
+
+    // -----------------------------
+    // 3D tilt helper
+    // -----------------------------
+    function addTilt(card){
+      const onMove = (ev) => {
+        const r = card.getBoundingClientRect();
+        const x = (ev.clientX - r.left) / r.width - 0.5;
+        const y = (ev.clientY - r.top) / r.height - 0.5;
+        card.style.transform = `rotateX(${(-y*6).toFixed(2)}deg) rotateY(${(x*8).toFixed(2)}deg) translateZ(6px)`;
+      };
+      const onLeave = () => { card.style.transform = `rotateX(0deg) rotateY(0deg) translateZ(0px)`; };
+      card.addEventListener("mousemove", onMove);
+      card.addEventListener("mouseleave", onLeave);
+    }
+
+    // -----------------------------
+    // Model (same principle as before)
+    // -----------------------------
+    let betEnabled = false;
+
     function pgsiMixAmongGamblers(age, sex){
       const base = PGSI_BY_SEX[sex] || PGSI_BY_SEX.male;
       const m = { ...base };
@@ -614,18 +963,13 @@
     function mapToLossBands(m){
       const p34 = m.mod_3_7 * (2/5);
       const p57 = m.mod_3_7 * (3/5);
-      return {
-        p0:  m.pgsi_0,
-        p14: m.low_1_2 + p34,
-        p5p: p57 + m.prob_8p
-      };
+      return { p0:m.pgsi_0, p14:m.low_1_2 + p34, p5p:p57 + m.prob_8p };
     }
 
     function blendedLoss(poundsAnchor, income, pctAnchor){
       if (!(income > 0)) return poundsAnchor;
       const incomeBased = income * pctAnchor;
 
-      // lean to incomeBased when income is small (fix tiny income weirdness)
       const t = clamp((income - 1000) / 9000, 0, 1);
       const wAnchor = t;
       const wIncome = 1 - t;
@@ -643,7 +987,6 @@
       return p0*loss0 + p14*loss14 + p5p*loss5p;
     }
 
-    // behavior-driven
     function expectedLossFromTurnover(betPerWeek, lossRate){
       const turnover = Math.max(0, betPerWeek) * 52;
       return turnover * clamp(lossRate, 0, 0.40);
@@ -657,43 +1000,81 @@
         const stakeCap = betPerWeek * 52;
         if (x > stakeCap){ x = stakeCap; caps.push("stake/yr"); }
       }
-
       if (income > 0 && income < 2000){
         const incomeCap = income * 0.60;
         if (x > incomeCap){ x = incomeCap; caps.push("low-income"); }
       }
-
       if (income > 0){
         const hard = income * 2.0;
         if (x > hard){ x = hard; caps.push("hard-income"); }
       }
-
       return { value:x, caps: caps.length ? caps.join("+") : "none" };
     }
 
     function outcomeBand(exp){ return [exp*0.4, exp*2.0]; }
     function fmtGBP0(x){ return "£" + x.toLocaleString(undefined, { maximumFractionDigits: 0 }); }
 
-    // --- sports leak map rendering ---
-    function renderSportPipes(selectedRate){
+    // -----------------------------
+    // FIXED visuals
+    // -----------------------------
+    function updateTank(betPerWeek, rate){
+      const fill = $("tankFill");
+      const leakPath = $("leakPath");
+      const leakRateLabel = $("leakRateLabel");
+      const betSummary = $("betSummary");
+
+      // If bet/week not enabled, keep clean and consistent
+      if (!betEnabled){
+        fill.setAttribute("y","140");
+        fill.setAttribute("height","0");
+        leakPath.setAttribute("opacity","0.0");
+        leakRateLabel.textContent = "—";
+        betSummary.textContent = "Toggle bet/week to see turnover fill.";
+        return;
+      }
+
+      const bet = Math.max(0, betPerWeek || 0);
+      const turnover = bet * 52;
+
+      // scale fill to a reasonable max (show saturation, not overflow)
+      const maxBet = 250; // £/wk -> 100% fill
+      const pct = clamp(bet / maxBet, 0, 1);
+      const h = 120 * pct;
+
+      fill.setAttribute("y", String(140 - h));
+      fill.setAttribute("height", String(h));
+
+      const showLeak = bet > 0;
+      leakPath.setAttribute("opacity", showLeak ? "0.9" : "0.0");
+      leakRateLabel.textContent = `lossRate: ${(rate*100).toFixed(1)}%`;
+
+      betSummary.textContent = bet > 0
+        ? `Turnover ≈ £${turnover.toFixed(0)}/yr (from £${bet.toFixed(0)}/wk)`
+        : "Enter bet/week to see turnover and leak.";
+    }
+
+    function updateIncomeViz(income){
+      const max = 50000;
+      const w = 484 * clamp((income || 0) / max, 0, 1);
+      $("incomeBar").setAttribute("width", String(w));
+      $("incomeLabel").textContent = income > 0 ? `£${income.toFixed(0)}/yr` : "—";
+    }
+
+    function renderSportPipes(selectedKey){
       const g = $("sportPipes");
       g.innerHTML = "";
 
-      // rank by rate desc
-      const ranked = [...SPORT_RISK].sort((a,b)=>b.rate-a.rate);
+      // build ranked list
+      const ranked = SPORT_ORDER
+        .map(k => ({ key:k, ...SPORT_RISK[k] }))
+        .sort((a,b)=>b.rate-a.rate);
 
       const maxRate = ranked[0].rate;
       const minRate = ranked[ranked.length-1].rate;
 
       ranked.forEach((s, i) => {
         const y = i * 36;
-
         const t = (s.rate - minRate) / (maxRate - minRate + 1e-9);
-        const leakW = 3 + t * 10; // thickness
-        const fill = "rgba(255,255,255,.75)";
-        const dim  = "rgba(255,255,255,.22)";
-
-        const isSelected = Math.abs(s.rate - selectedRate) < 1e-9;
 
         const row = document.createElementNS("http://www.w3.org/2000/svg","g");
         row.setAttribute("transform", `translate(0,${y})`);
@@ -701,10 +1082,10 @@
         const label = document.createElementNS("http://www.w3.org/2000/svg","text");
         label.setAttribute("x","0");
         label.setAttribute("y","14");
-        label.setAttribute("fill","rgba(255,255,255,.75)");
+        label.setAttribute("fill","rgba(255,255,255,.78)");
         label.setAttribute("font-size","12");
         label.setAttribute("font-family","ui-monospace, monospace");
-        label.textContent = `${s.name}`;
+        label.textContent = s.name;
 
         const pipe = document.createElementNS("http://www.w3.org/2000/svg","rect");
         pipe.setAttribute("x","140");
@@ -713,7 +1094,7 @@
         pipe.setAttribute("height","14");
         pipe.setAttribute("rx","7");
         pipe.setAttribute("fill","rgba(255,255,255,.06)");
-        pipe.setAttribute("stroke", dim);
+        pipe.setAttribute("stroke","rgba(255,255,255,.18)");
 
         const leak = document.createElementNS("http://www.w3.org/2000/svg","rect");
         leak.setAttribute("x","140");
@@ -721,20 +1102,20 @@
         leak.setAttribute("width", String(290 * t));
         leak.setAttribute("height","14");
         leak.setAttribute("rx","7");
-        leak.setAttribute("fill", isSelected ? "rgba(255,255,255,.90)" : fill);
+        leak.setAttribute("fill", s.key === selectedKey ? "rgba(255,255,255,.92)" : "rgba(255,255,255,.65)");
 
         const drip = document.createElementNS("http://www.w3.org/2000/svg","path");
-        drip.setAttribute("d", `M430 12 C450 18, 460 26, 480 30`);
+        drip.setAttribute("d", `M430 12 C452 18, 460 26, 488 30`);
         drip.setAttribute("fill","none");
-        drip.setAttribute("stroke", isSelected ? "rgba(255,255,255,.90)" : "rgba(255,255,255,.65)");
-        drip.setAttribute("stroke-width", String(leakW));
+        drip.setAttribute("stroke", s.key === selectedKey ? "rgba(255,255,255,.92)" : "rgba(255,255,255,.55)");
+        drip.setAttribute("stroke-width", String(3 + t * 10));
         drip.setAttribute("stroke-linecap","round");
         drip.setAttribute("opacity", "0.9");
 
         const pct = document.createElementNS("http://www.w3.org/2000/svg","text");
         pct.setAttribute("x","450");
         pct.setAttribute("y","16");
-        pct.setAttribute("fill","rgba(255,255,255,.75)");
+        pct.setAttribute("fill","rgba(255,255,255,.78)");
         pct.setAttribute("font-size","12");
         pct.setAttribute("font-family","ui-monospace, monospace");
         pct.textContent = `${(s.rate*100).toFixed(1)}%`;
@@ -751,50 +1132,21 @@
       $("topRisk").textContent = `Highest leak proxy: ${top.name} (${(top.rate*100).toFixed(1)}%) — ${top.note}`;
     }
 
-    // --- staged visuals ---
-    function updateTank(betPerWeek, rate){
-      const maxBet = 200; // visual scale
-      const fillPct = clamp((betPerWeek || 0) / maxBet, 0, 1);
-
-      const h = 120 * fillPct;
-      $("tankFill").setAttribute("y", String(140 - h));
-      $("tankFill").setAttribute("height", String(h));
-
-      const showLeak = betPerWeek > 0;
-      $("leakPath").setAttribute("opacity", showLeak ? "0.9" : "0.0");
-      $("leakRateLabel").textContent = `lossRate: ${(rate*100).toFixed(1)}%`;
-
-      if (betPerWeek > 0){
-        const turnover = betPerWeek * 52;
-        $("betSummary").textContent = `Turnover ≈ £${turnover.toFixed(0)}/yr (from £${betPerWeek.toFixed(0)}/wk)`;
-      } else {
-        $("betSummary").textContent = `Enter bet/week to see turnover and leak.`;
-      }
+    // -----------------------------
+    // Banana stat
+    // -----------------------------
+    function bananaStat(expLoss){
+      // Convert expected loss (£) into bananas
+      // bananas = (£ / £/kg) * bananas/kg
+      const bananas = (expLoss / BANANA_PRICE_PER_KG_GBP) * BANANAS_PER_KG;
+      if (!isFinite(bananas) || bananas < 0) return "—";
+      const rounded = Math.max(0, Math.round(bananas));
+      return `${rounded.toLocaleString()} bananas`;
     }
 
-    function updateIncomeViz(income){
-      const max = 50000;
-      const w = 484 * clamp((income || 0) / max, 0, 1);
-      $("incomeBar").setAttribute("width", String(w));
-      $("incomeLabel").textContent = income > 0 ? `£${income.toFixed(0)}/yr` : "—";
-    }
-
-    // --- 3D tilt ---
-    function addTilt(card){
-      const onMove = (ev) => {
-        const r = card.getBoundingClientRect();
-        const x = (ev.clientX - r.left) / r.width - 0.5;
-        const y = (ev.clientY - r.top) / r.height - 0.5;
-        card.style.transform = `rotateX(${(-y*6).toFixed(2)}deg) rotateY(${(x*8).toFixed(2)}deg) translateZ(6px)`;
-      };
-      const onLeave = () => { card.style.transform = `rotateX(0deg) rotateY(0deg) translateZ(0px)`; };
-      card.addEventListener("mousemove", onMove);
-      card.addEventListener("mouseleave", onLeave);
-    }
-
-    // --- state ---
-    let betEnabled = false;
-
+    // -----------------------------
+    // UI glue
+    // -----------------------------
     function setBetUI(){
       $("betSwitch").classList.toggle("on", betEnabled);
       $("betRow").style.display = betEnabled ? "flex" : "none";
@@ -806,27 +1158,31 @@
       const sex = $("sex").value;
       const income = Number($("income").value);
       const bet = betEnabled ? Number($("betPerWeek").value || 0) : 0;
-      const rate = Number($("edgePreset").value);
+      const sportKey = $("sportKey").value;
+      const rate = SPORT_RISK[sportKey].rate;
 
       $("ageVal").textContent = String(age);
 
-      updateTank(bet, rate);
       updateIncomeViz(income);
+      updateTank(bet, rate);
+      renderSportPipes(sportKey);
+      $("riskExplain").textContent = `Selected: ${SPORT_RISK[sportKey].name} (${(rate*100).toFixed(1)}%)`;
 
-      // demographics effect display
+      // Demographic effect indicator
       if (betEnabled && bet > 0){
         $("demoEffect").textContent = "OFF";
         $("demoEffect2").textContent = "bet/week ON → demographics do not change £";
-        $("demoKnob").setAttribute("cx","243");
+        $("demoKnob").setAttribute("cx","260");
       } else {
         $("demoEffect").textContent = "ON";
         $("demoEffect2").textContent = "bet/week OFF → demographics influence fallback model";
         $("demoKnob").setAttribute("cx","35");
       }
 
-      // compute expected loss
+      // Expected loss
+      const mix = pgsiMixAmongGamblers(age, sex);
       let exp, modeLine;
-      let mix = pgsiMixAmongGamblers(age, sex); // always computed for consistency (even if not used for £)
+
       if (betEnabled && bet > 0){
         exp = expectedLossFromTurnover(bet, rate);
         modeLine = `Mode: turnover × lossRate (${(rate*100).toFixed(1)}%)`;
@@ -842,12 +1198,11 @@
 
       $("expLoss").textContent = fmtGBP0(exp);
       $("band").textContent = `${fmtGBP0(lo)} — ${fmtGBP0(hi)} (loose band)`;
+      $("modeLine").textContent = modeLine;
+      $("capLine").textContent = `CAPS: ${capped.caps}`;
 
       const pos = clamp((exp - lo) / (hi - lo), 0, 1);
       $("posBar").style.width = (pos * 100).toFixed(1) + "%";
-
-      $("modeLine").textContent = modeLine;
-      $("capLine").textContent = `CAPS: ${capped.caps}`;
 
       if (income > 0){
         const pct = exp / income;
@@ -858,26 +1213,235 @@
         $("pctBar").style.width = "0%";
       }
 
-      // sports risk: highlight chosen rate
-      renderSportPipes(rate);
-      $("riskExplain").textContent = `Selected lossRate: ${(rate*100).toFixed(1)}% (used when bet/week ON)`;
+      $("bananaLine").innerHTML = `You could buy: <span style="font-family:var(--mono); color:rgba(255,255,255,.88)">${bananaStat(exp)}</span> 🍌`;
+
+      // If user changed something, do a tiny goop pulse
+      triggerGoop(260);
+
+      // Update game banner odds whenever sport changes (just cosmetic)
+      updateGameOddsBanner();
     }
 
-    // init
+    // -----------------------------
+    // Horse racing simulator (house edge via overround)
+    // -----------------------------
+    let bank = 100;
+    let races = 0;
+    let totalStaked = 0;
+
+    // These are generated per "session" so the game feels consistent
+    let trueProbs = [0.25, 0.22, 0.20, 0.18, 0.15]; // will be randomized on reset
+    let bookOdds = [3.0, 3.5, 4.0, 4.5, 5.0]; // decimal odds from overround pricing
+
+    function randDirichlet5(){
+      // quick + dirty: gamma(1) ~ -ln(U)
+      const g = Array.from({length:5}, () => -Math.log(Math.max(1e-9, Math.random())));
+      const s = g.reduce((a,b)=>a+b,0);
+      return g.map(x=>x/s);
+    }
+
+    function computeBookOdds(overround){
+      // Overround model:
+      // - True probs p_i sum to 1
+      // - Book probs q_i = p_i * overround
+      // - Decimal odds = 1 / q_i
+      // (This is the simplest overround -> negative EV construction.)
+      const q = trueProbs.map(p => p * overround);
+      return q.map(x => 1 / x);
+    }
+
+    function fmtDecOdds(x){
+      return x.toFixed(2) + "x";
+    }
+
+    function updateGameOddsUI(){
+      $("o0").textContent = fmtDecOdds(bookOdds[0]);
+      $("o1").textContent = fmtDecOdds(bookOdds[1]);
+      $("o2").textContent = fmtDecOdds(bookOdds[2]);
+      $("o3").textContent = fmtDecOdds(bookOdds[3]);
+      $("o4").textContent = fmtDecOdds(bookOdds[4]);
+      updateGameOddsBanner();
+    }
+
+    function updateGameOddsBanner(){
+      const ov = Number($("overround").value);
+      $("oddsBanner").textContent = `Overround: ${(ov*100).toFixed(0)}% (book > 100% = house edge)`;
+    }
+
+    function chooseWinner(){
+      // sample winner from true probs (not the book)
+      const r = Math.random();
+      let cum = 0;
+      for (let i=0;i<trueProbs.length;i++){
+        cum += trueProbs[i];
+        if (r <= cum) return i;
+      }
+      return trueProbs.length - 1;
+    }
+
+    function resetHorses(){
+      for (let i=0;i<5;i++){
+        $("h"+i).style.transform = `translateX(0px)`;
+      }
+    }
+
+    function runRaceAnimated(pick, stake){
+      // Determine outcome immediately, animate visuals for fun
+      const winner = chooseWinner();
+
+      // Move horses with a slight bias to the winner (without making it obvious)
+      const track = $("track");
+      const finishX = track.clientWidth - 40 - 110; // finish line minus horse width-ish
+      const base = finishX;
+
+      const durations = [];
+      for (let i=0;i<5;i++){
+        const noise = (Math.random() * 0.22) + 0.95;
+        const winBoost = (i === winner) ? 0.86 : 1.0;
+        durations[i] = 1100 * noise * winBoost;
+      }
+
+      // Apply transforms with transitions
+      for (let i=0;i<5;i++){
+        const h = $("h"+i);
+        h.style.transition = `transform ${durations[i].toFixed(0)}ms cubic-bezier(.2,.8,.2,1)`;
+        h.style.transform = `translateX(${base}px)`;
+      }
+
+      // Settle payout after the slowest finishes
+      const settleIn = Math.max(...durations) + 40;
+      setTimeout(() => {
+        // remove transitions
+        for (let i=0;i<5;i++){
+          $("h"+i).style.transition = "";
+        }
+        settleBet(pick, stake, winner);
+        // reset positions (with tiny delay so it doesn't feel glitchy)
+        setTimeout(resetHorses, 420);
+      }, settleIn);
+    }
+
+    function settleBet(pick, stake, winner){
+      races += 1;
+      totalStaked += stake;
+
+      // stake leaves bankroll
+      bank -= stake;
+
+      let payout = 0;
+      if (pick === winner){
+        // decimal odds include stake in return in real-world; for clarity we’ll pay PROFIT only:
+        // profit = stake*(odds-1)
+        payout = stake * (bookOdds[winner] - 1);
+        bank += stake + payout; // return stake + profit
+      }
+
+      // UI
+      $("bank").textContent = "£" + bank.toFixed(2);
+      $("races").textContent = String(races);
+
+      const roi = totalStaked > 0 ? ((bank - 100) / totalStaked) * 100 : 0;
+      $("roi").textContent = roi.toFixed(2) + "%";
+
+      $("lastResult").textContent = pick === winner
+        ? `Last: WIN (Horse ${winner+1}) +£${payout.toFixed(2)}`
+        : `Last: LOSS (Horse ${winner+1})`;
+    }
+
+    function runSim(n){
+      // Fast, no animation: demonstrates EV.
+      const pick = Number($("pickHorse").value);
+      const stake = Math.max(1, Number($("stake").value || 1));
+
+      for (let i=0;i<n;i++){
+        const winner = chooseWinner();
+        races += 1;
+        totalStaked += stake;
+        bank -= stake;
+        if (pick === winner){
+          const payout = stake * (bookOdds[winner] - 1);
+          bank += stake + payout;
+        }
+      }
+
+      $("bank").textContent = "£" + bank.toFixed(2);
+      $("races").textContent = String(races);
+      const roi = totalStaked > 0 ? ((bank - 100) / totalStaked) * 100 : 0;
+      $("roi").textContent = roi.toFixed(2) + "%";
+      $("lastResult").textContent = `Last: simulated ${n.toLocaleString()} races`;
+      triggerGoop(380);
+    }
+
+    function resetGame(){
+      bank = 100;
+      races = 0;
+      totalStaked = 0;
+
+      // new “true” race each reset
+      trueProbs = randDirichlet5().map(p => 0.06 + 0.94*p); // avoid absurd tiny
+      // normalize again
+      const s = trueProbs.reduce((a,b)=>a+b,0);
+      trueProbs = trueProbs.map(x=>x/s);
+
+      const ov = Number($("overround").value);
+      bookOdds = computeBookOdds(ov);
+
+      $("bank").textContent = "£" + bank.toFixed(2);
+      $("races").textContent = "0";
+      $("roi").textContent = "0.00%";
+      $("lastResult").textContent = "Last: —";
+      updateGameOddsUI();
+      resetHorses();
+      triggerGoop(520);
+    }
+
+    function updateOverround(){
+      const ov = Number($("overround").value);
+      bookOdds = computeBookOdds(ov);
+      updateGameOddsUI();
+      triggerGoop(260);
+    }
+
+    // -----------------------------
+    // Wire UI
+    // -----------------------------
     addTilt($("cBet")); addTilt($("vBet"));
     addTilt($("cIncome")); addTilt($("vIncome"));
     addTilt($("cDemo")); addTilt($("vDemo"));
     addTilt($("cResult")); addTilt($("cSports"));
+    addTilt($("cGame")); addTilt($("cOutro"));
 
-    $("betSwitch").addEventListener("click", () => { betEnabled = !betEnabled; setBetUI(); recalc(); });
+    $("betSwitch").addEventListener("click", () => {
+      betEnabled = !betEnabled;
+      setBetUI();
+      recalc();
+    });
+
     $("betPerWeek").addEventListener("input", recalc);
-    $("edgePreset").addEventListener("change", recalc);
+    $("sportKey").addEventListener("change", recalc);
     $("income").addEventListener("input", recalc);
     $("age").addEventListener("input", recalc);
     $("sex").addEventListener("change", recalc);
 
+    // game
+    $("raceBtn").addEventListener("click", () => {
+      const pick = Number($("pickHorse").value);
+      const stake = Math.max(1, Number($("stake").value || 1));
+      runRaceAnimated(pick, stake);
+      triggerGoop(420);
+    });
+    $("sim1kBtn").addEventListener("click", () => runSim(1000));
+    $("sim10kBtn").addEventListener("click", () => runSim(10000));
+    $("resetBankBtn").addEventListener("click", resetGame);
+    $("overround").addEventListener("change", () => { updateOverround(); });
+
+    // init
     setBetUI();
     recalc();
+    updateHUD();
+    updateGameOddsBanner();
+    resetGame();
+    requestAnimationFrame(animateGoop);
   </script>
 </body>
 </html>
