@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Expected Gambling Loss — Story Mode</title>
+
+  <style>
+    :root{
+      --bg:#000;
+      --fg:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.58);
+      --muted2:rgba(255,255,255,.40);
+      --line:rgba(255,255,255,.10);
+      --panel:rgba(10,10,10,.70);
+      --shadow: 0 24px 70px rgba(0,0,0,.75);
+      --r:18px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--fg);
+      font: 14px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      letter-spacing:.12px;
+      overflow-x:hidden;
+    }
+
+    /* subtle grain */
+    body:before{
+      content:"";
+      position:fixed; inset:0;
+      pointer-events:none;
+      opacity:.09;
+      mix-blend-mode:overlay;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
+      z-index:0;
+    }
+
+    .scene{
+      position:relative;
+      z-index:1;
+      perspective: 1200px;
+      transform-style:preserve-3d;
+    }
+
+    .snap{
+      height:100vh;
+      overflow-y:auto;
+      scroll-snap-type: y mandatory;
+      scroll-behavior:smooth;
+    }
+
+    section{
+      min-height:100vh;
+      scroll-snap-align:start;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 26px 18px;
+      position:relative;
+      transform-style:preserve-3d;
+    }
+
+    .wrap{
+      width:min(1040px, 100%);
+      display:grid;
+      grid-template-columns: 420px 1fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 960px){
+      .wrap{ grid-template-columns: 1fr; }
+    }
+
+    .hero{
+      width:min(980px, 100%);
+      transform: translateZ(40px);
+    }
+    .kicker{
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.22em;
+      font-size:11px;
+      margin-bottom:8px;
+    }
+    h1{
+      margin:0;
+      font-size: 30px;
+      line-height: 1.05;
+      font-weight: 860;
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin-top: 10px;
+      color:var(--muted);
+      max-width: 80ch;
+      font-size: 13px;
+    }
+
+    .card{
+      border:1px solid var(--line);
+      border-radius: var(--r);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+      transform-style:preserve-3d;
+    }
+    .inner{ padding: 16px; }
+
+    .title{
+      margin:0 0 12px;
+      color:var(--muted);
+      font-weight: 800;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      font-size: 11px;
+    }
+
+    label{ color:var(--muted); }
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin: 10px 0;
+    }
+
+    input[type="range"]{ width:100%; }
+    input[type="number"], select{
+      width: 180px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.55);
+      color:var(--fg);
+      outline:none;
+    }
+
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+
+    .pill{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      margin-top: 10px;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: rgba(255,255,255,.78);
+      box-shadow: 0 0 0 5px rgba(255,255,255,.08);
+    }
+
+    .toggle{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 10px 12px;
+      border:1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(0,0,0,.35);
+      margin-top: 12px;
+    }
+    .toggle .left{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-width:0;
+    }
+    .toggle .left b{
+      font-size: 12px;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      color: var(--muted);
+    }
+    .toggle .left span{
+      color: var(--muted2);
+      font-size: 12px;
+    }
+
+    .switch{
+      position:relative;
+      width: 54px;
+      height: 30px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border:1px solid var(--line);
+      cursor:pointer;
+      flex:0 0 auto;
+    }
+    .switch i{
+      position:absolute;
+      top: 3px; left: 3px;
+      width: 24px; height: 24px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      transition: transform .18s ease;
+      will-change: transform;
+    }
+    .switch.on i{ transform: translateX(24px); }
+
+    .split{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top: 10px;
+    }
+    @media (max-width: 600px){
+      .split{ grid-template-columns: 1fr; }
+    }
+
+    .stat{
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.45);
+      border-radius: 16px;
+      padding: 12px;
+    }
+    .stat .k{ color:var(--muted); font-size: 12px; }
+    .stat .v{ font-size: 24px; font-weight: 900; margin-top: 2px; letter-spacing:.2px; }
+    .stat .s{ color:var(--muted2); font-size: 12px; margin-top: 4px; }
+
+    .bar{
+      height: 10px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      overflow:hidden;
+      margin-top: 10px;
+    }
+    .bar > i{
+      display:block;
+      height:100%;
+      width:0%;
+      background: rgba(255,255,255,.80);
+      transition: width .35s ease;
+    }
+
+    .note{
+      color:var(--muted2);
+      font-size: 12px;
+      margin-top: 12px;
+      line-height:1.55;
+    }
+
+    /* story staging */
+    .stageText{
+      position:relative;
+      transform: translateZ(34px);
+    }
+
+    /* simple “illustration” panel */
+    .viz{
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      background: rgba(0,0,0,.35);
+      padding: 12px;
+      margin-top: 12px;
+      overflow:hidden;
+    }
+
+    /* scroll hint */
+    .scrollHint{
+      position:absolute;
+      left:50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      color: var(--muted2);
+      font-size: 12px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      user-select:none;
+      pointer-events:none;
+    }
+    .scrollHint i{
+      display:inline-block;
+      width: 18px; height: 28px;
+      border:1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      position:relative;
+    }
+    .scrollHint i:after{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:6px;
+      width: 4px; height: 6px;
+      background: rgba(255,255,255,.45);
+      border-radius: 99px;
+      transform: translateX(-50%);
+      animation: wheel 1.2s ease-in-out infinite;
+    }
+    @keyframes wheel{
+      0%{ transform: translateX(-50%) translateY(0); opacity:.55; }
+      70%{ transform: translateX(-50%) translateY(10px); opacity:.15; }
+      100%{ opacity:.55; }
+    }
+
+    /* 3D tilt (applied via JS) */
+    .tilt{ transform: rotateX(0) rotateY(0) translateZ(0); will-change: transform; }
+  </style>
+</head>
+
+<body>
+  <div class="scene">
+    <div class="snap" id="snap">
+
+      <!-- CHAPTER 1 -->
+      <section>
+        <div class="hero stageText">
+          <div class="kicker">Story mode • scroll to progress</div>
+          <h1>Your money, in leaks.</h1>
+          <div class="sub">
+            This is expected value, not a fortune teller. We’ll build the estimate step-by-step.
+            If you enter <span class="mono">bet/week</span>, the £ result is driven by the wager maths, not age or gender.
+          </div>
+          <div class="pill mono"><span class="dot"></span> ASSUMPTION: gambles this year</div>
+        </div>
+        <div class="scrollHint"><i></i> scroll</div>
+      </section>
+
+      <!-- CHAPTER 2: Bet/week -->
+      <section>
+        <div class="wrap">
+          <div class="card tilt" id="cBet">
+            <div class="inner">
+              <div class="title">Stage 1 — What do you stake?</div>
+
+              <div class="toggle">
+                <div class="left">
+                  <b>Use bet/week</b>
+                  <span>Turns on behavior-driven estimate (age/sex won’t change £).</span>
+                </div>
+                <div class="switch" id="betSwitch" role="button" aria-label="Toggle bet/week"><i></i></div>
+              </div>
+
+              <div class="row" id="betRow" style="display:none; margin-top:12px;">
+                <label for="betPerWeek">Bet/week (£)</label>
+                <input id="betPerWeek" type="number" min="0" step="5" placeholder="e.g. 50" />
+              </div>
+
+              <div class="row" style="margin-top:12px;">
+                <label for="edgePreset">Game type</label>
+                <select id="edgePreset">
+                  <option value="0.078">Soccer-like (≈7.8%)</option>
+                  <option value="0.075">Tennis-like (≈7.5%)</option>
+                  <option value="0.120">Racing-like (≈12%)</option>
+                  <option value="0.260">Greyhound-like (≈26%)</option>
+                </select>
+              </div>
+
+              <div class="note">
+                The “game type” is an expected loss rate. It’s a proxy for margin/overround differences across markets.
+              </div>
+            </div>
+          </div>
+
+          <div class="card tilt" id="vBet">
+            <div class="inner">
+              <div class="title">Visual</div>
+              <div class="viz">
+                <!-- simple leak tank -->
+                <svg viewBox="0 0 520 180" width="100%" height="180" aria-label="Leak tank">
+                  <rect x="18" y="20" width="300" height="120" rx="18" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="2"/>
+                  <rect x="18" y="20" width="300" height="120" rx="18" fill="rgba(255,255,255,.05)"/>
+                  <text x="28" y="54" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">TURNOVER</text>
+
+                  <!-- fill based on bet/week -->
+                  <clipPath id="tankClip"><rect x="18" y="20" width="300" height="120" rx="18"/></clipPath>
+                  <rect id="tankFill" x="18" y="140" width="300" height="0" fill="rgba(255,255,255,.75)" clip-path="url(#tankClip)"/>
+
+                  <!-- leak pipe -->
+                  <rect x="340" y="68" width="90" height="20" rx="10" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.22)"/>
+                  <circle cx="338" cy="78" r="12" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.22)"/>
+
+                  <!-- leak stream -->
+                  <path id="leakPath" d="M430 78 C460 90, 470 110, 492 132" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-linecap="round" opacity="0.0"/>
+                  <text x="340" y="52" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">LEAK RATE</text>
+
+                  <text id="leakRateLabel" x="340" y="112" fill="rgba(255,255,255,.85)" font-size="14" font-family="ui-monospace, monospace">—</text>
+                </svg>
+              </div>
+
+              <div class="note mono" id="betSummary">Enter bet/week to see the tank fill.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHAPTER 3: Income -->
+      <section>
+        <div class="wrap">
+          <div class="card tilt" id="cIncome">
+            <div class="inner">
+              <div class="title">Stage 2 — What can you afford?</div>
+              <div class="row">
+                <label for="income">Disposable income (£/year)</label>
+                <input id="income" type="number" min="0" step="50" value="20000" />
+              </div>
+
+              <div class="note">
+                Low-income guardrails prevent absurd outputs when income is tiny.
+              </div>
+            </div>
+          </div>
+
+          <div class="card tilt" id="vIncome">
+            <div class="inner">
+              <div class="title">Visual</div>
+              <div class="viz">
+                <!-- “budget rail” -->
+                <svg viewBox="0 0 520 180" width="100%" height="180" aria-label="Budget rail">
+                  <text x="18" y="32" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">DISPOSABLE INCOME</text>
+                  <rect x="18" y="56" width="484" height="16" rx="8" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.12)"/>
+                  <rect id="incomeBar" x="18" y="56" width="0" height="16" rx="8" fill="rgba(255,255,255,.75)"/>
+                  <text id="incomeLabel" x="18" y="104" fill="rgba(255,255,255,.85)" font-size="16" font-family="ui-monospace, monospace">—</text>
+
+                  <text x="18" y="136" fill="rgba(255,255,255,.45)" font-size="12" font-family="ui-monospace, monospace">
+                    (scaled to £0 → £50k for display)
+                  </text>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHAPTER 4: Demographics (only influences when bet/week OFF) -->
+      <section>
+        <div class="wrap">
+          <div class="card tilt" id="cDemo">
+            <div class="inner">
+              <div class="title">Stage 3 — Demographics</div>
+
+              <div class="row">
+                <label for="age">Age</label>
+                <div class="mono" id="ageVal">30</div>
+              </div>
+              <input id="age" type="range" min="18" max="90" value="30" />
+
+              <div class="row" style="margin-top:12px;">
+                <label for="sex">Sex</label>
+                <select id="sex">
+                  <option value="male">male</option>
+                  <option value="female">female</option>
+                </select>
+              </div>
+
+              <div class="note" id="demoNote">
+                If bet/week is ON, these do not change the £ outcome.
+              </div>
+            </div>
+          </div>
+
+          <div class="card tilt" id="vDemo">
+            <div class="inner">
+              <div class="title">Visual</div>
+              <div class="viz">
+                <svg viewBox="0 0 520 180" width="100%" height="180" aria-label="Demographic effect">
+                  <text x="18" y="32" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">EFFECT ON £ OUTCOME</text>
+                  <text id="demoEffect" x="18" y="72" fill="rgba(255,255,255,.88)" font-size="22" font-family="ui-monospace, monospace">—</text>
+                  <text id="demoEffect2" x="18" y="102" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">—</text>
+
+                  <!-- little “switch” diagram -->
+                  <rect x="18" y="126" width="260" height="34" rx="17" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.12)"/>
+                  <circle id="demoKnob" cx="35" cy="143" r="12" fill="rgba(255,255,255,.85)"/>
+                  <text x="64" y="148" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">
+                    bet/week OFF → demographics ON
+                  </text>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHAPTER 5: Result + Sports Risk -->
+      <section>
+        <div class="wrap">
+          <div class="card tilt" id="cResult">
+            <div class="inner">
+              <div class="title">Final — What leaks out?</div>
+
+              <div class="split">
+                <div class="stat">
+                  <div class="k">Expected annual net loss</div>
+                  <div class="v mono" id="expLoss">—</div>
+                  <div class="s mono" id="band">—</div>
+                  <div class="bar"><i id="posBar"></i></div>
+                </div>
+
+                <div class="stat">
+                  <div class="k">Loss as % of income</div>
+                  <div class="v mono" id="pctIncome">—</div>
+                  <div class="s mono" id="modeLine">—</div>
+                  <div class="bar"><i id="pctBar"></i></div>
+                </div>
+              </div>
+
+              <div class="note mono" id="capLine">CAPS: —</div>
+              <div class="note">
+                If bet/week is ON, the loss is driven by <span class="mono">lossRate × turnover</span> (no “age/gender luck”).
+              </div>
+            </div>
+          </div>
+
+          <div class="card tilt" id="cSports">
+            <div class="inner">
+              <div class="title">Where you’re most likely to leak money</div>
+              <div class="note" style="margin-top:-4px;">
+                These are rough, evidence-anchored “loss rate” proxies (bookmaker margin / realized loss rates). Higher = worse value on average.
+              </div>
+
+              <div class="viz">
+                <!-- Leak Map: pipes with leak thickness -->
+                <svg viewBox="0 0 520 220" width="100%" height="220" aria-label="Sports leak map">
+                  <text x="18" y="30" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">LEAK MAP (higher % = bigger leak)</text>
+
+                  <!-- Pipe rows -->
+                  <g id="sportPipes" transform="translate(18,52)">
+                    <!-- generated by JS -->
+                  </g>
+
+                  <text id="riskExplain" x="18" y="206" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">—</text>
+                </svg>
+              </div>
+
+              <div class="note mono" id="topRisk">—</div>
+              <div class="note">
+                Tip: “Greyhound-like” markets tend to have much fatter books than major-match soccer/tennis.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script>
+    // --------------------
+    // Core principle:
+    // If bet/week is ON and bet/week > 0, the £ outcome is behavior-driven:
+    //   expectedLoss = lossRate * (bet/week * 52)
+    // Demographics should not move that number.
+    //
+    // If bet/week is OFF, we fall back to demographic risk-mix + income scaling (with caps).
+    // --------------------
+
+    // Open-banking anchored annual losses by PGSI group (fallback mode only)
+    const LOSS_PGSI0   = 196.95;
+    const LOSS_PGSI1_4 = 955.21;
+    const LOSS_PGSI5P  = 2506.91;
+
+    const AT_RISK_LOSS_PCT_INCOME   = 0.023;
+    const HIGH_RISK_LOSS_PCT_INCOME = 0.059;
+
+    // PGSI mix among gamblers by sex (fallback mode only)
+    const PGSI_BY_SEX = {
+      male:   { low_1_2: 0.165, mod_3_7: 0.066, prob_8p: 0.060 },
+      female: { low_1_2: 0.130, mod_3_7: 0.039, prob_8p: 0.028 },
+    };
+    const YOUNG_MULT = 2.27;
+    const OLD_MULT   = 0.11;
+
+    // Evidence-anchored sport “loss rate” presets (used when bet/week ON)
+    // Soccer/Tennis from realized loss rates in Hegarty (losses > overround prediction).
+    // Greyhound overround typical ~126% (≈26%).
+    // Racing-like 12% as a conservative mid value (race books vary with field size).
+    const SPORT_RISK = [
+      { key:"soccer",    name:"Soccer",    rate:0.078, note:"realized avg loss ~7.8%" },
+      { key:"tennis",    name:"Tennis",    rate:0.075, note:"realized avg loss ~7.5%" },
+      { key:"racing",    name:"Racing",    rate:0.120, note:"example ‘fatter’ books" },
+      { key:"greyhound", name:"Greyhound", rate:0.260, note:"typical book ~126% (~26%)" },
+    ];
+
+    const $ = (id) => document.getElementById(id);
+    const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+    const lerp = (a,b,t) => a + (b-a) * t;
+
+    // --- fallback demographic mix ---
+    function pgsiMixAmongGamblers(age, sex){
+      const base = PGSI_BY_SEX[sex] || PGSI_BY_SEX.male;
+      const m = { ...base };
+
+      let ageMult;
+      if (age <= 21) ageMult = YOUNG_MULT;
+      else if (age >= 78) ageMult = OLD_MULT;
+      else ageMult = lerp(YOUNG_MULT, OLD_MULT, (age - 21) / (78 - 21));
+
+      m.prob_8p = clamp(m.prob_8p * ageMult, 0, 0.35);
+
+      const scale = (1 - m.prob_8p) / (1 - base.prob_8p);
+      m.low_1_2 *= scale;
+      m.mod_3_7 *= scale;
+
+      m.pgsi_0 = clamp(1 - (m.low_1_2 + m.mod_3_7 + m.prob_8p), 0, 1);
+      return m;
+    }
+
+    function mapToLossBands(m){
+      const p34 = m.mod_3_7 * (2/5);
+      const p57 = m.mod_3_7 * (3/5);
+      return {
+        p0:  m.pgsi_0,
+        p14: m.low_1_2 + p34,
+        p5p: p57 + m.prob_8p
+      };
+    }
+
+    function blendedLoss(poundsAnchor, income, pctAnchor){
+      if (!(income > 0)) return poundsAnchor;
+      const incomeBased = income * pctAnchor;
+
+      // lean to incomeBased when income is small (fix tiny income weirdness)
+      const t = clamp((income - 1000) / 9000, 0, 1);
+      const wAnchor = t;
+      const wIncome = 1 - t;
+
+      const a = Math.max(1e-9, poundsAnchor);
+      const b = Math.max(1e-9, incomeBased);
+      return Math.exp(Math.log(a)*wAnchor + Math.log(b)*wIncome);
+    }
+
+    function expectedLossDemographic(mix, income){
+      const { p0, p14, p5p } = mapToLossBands(mix);
+      const loss0  = LOSS_PGSI0;
+      const loss14 = blendedLoss(LOSS_PGSI1_4, income, AT_RISK_LOSS_PCT_INCOME);
+      const loss5p = blendedLoss(LOSS_PGSI5P,  income, HIGH_RISK_LOSS_PCT_INCOME);
+      return p0*loss0 + p14*loss14 + p5p*loss5p;
+    }
+
+    // behavior-driven
+    function expectedLossFromTurnover(betPerWeek, lossRate){
+      const turnover = Math.max(0, betPerWeek) * 52;
+      return turnover * clamp(lossRate, 0, 0.40);
+    }
+
+    function applyCaps(expLoss, income, betPerWeek){
+      const caps = [];
+      let x = expLoss;
+
+      if (betPerWeek > 0){
+        const stakeCap = betPerWeek * 52;
+        if (x > stakeCap){ x = stakeCap; caps.push("stake/yr"); }
+      }
+
+      if (income > 0 && income < 2000){
+        const incomeCap = income * 0.60;
+        if (x > incomeCap){ x = incomeCap; caps.push("low-income"); }
+      }
+
+      if (income > 0){
+        const hard = income * 2.0;
+        if (x > hard){ x = hard; caps.push("hard-income"); }
+      }
+
+      return { value:x, caps: caps.length ? caps.join("+") : "none" };
+    }
+
+    function outcomeBand(exp){ return [exp*0.4, exp*2.0]; }
+    function fmtGBP0(x){ return "£" + x.toLocaleString(undefined, { maximumFractionDigits: 0 }); }
+
+    // --- sports leak map rendering ---
+    function renderSportPipes(selectedRate){
+      const g = $("sportPipes");
+      g.innerHTML = "";
+
+      // rank by rate desc
+      const ranked = [...SPORT_RISK].sort((a,b)=>b.rate-a.rate);
+
+      const maxRate = ranked[0].rate;
+      const minRate = ranked[ranked.length-1].rate;
+
+      ranked.forEach((s, i) => {
+        const y = i * 36;
+
+        const t = (s.rate - minRate) / (maxRate - minRate + 1e-9);
+        const leakW = 3 + t * 10; // thickness
+        const fill = "rgba(255,255,255,.75)";
+        const dim  = "rgba(255,255,255,.22)";
+
+        const isSelected = Math.abs(s.rate - selectedRate) < 1e-9;
+
+        const row = document.createElementNS("http://www.w3.org/2000/svg","g");
+        row.setAttribute("transform", `translate(0,${y})`);
+
+        const label = document.createElementNS("http://www.w3.org/2000/svg","text");
+        label.setAttribute("x","0");
+        label.setAttribute("y","14");
+        label.setAttribute("fill","rgba(255,255,255,.75)");
+        label.setAttribute("font-size","12");
+        label.setAttribute("font-family","ui-monospace, monospace");
+        label.textContent = `${s.name}`;
+
+        const pipe = document.createElementNS("http://www.w3.org/2000/svg","rect");
+        pipe.setAttribute("x","140");
+        pipe.setAttribute("y","5");
+        pipe.setAttribute("width","290");
+        pipe.setAttribute("height","14");
+        pipe.setAttribute("rx","7");
+        pipe.setAttribute("fill","rgba(255,255,255,.06)");
+        pipe.setAttribute("stroke", dim);
+
+        const leak = document.createElementNS("http://www.w3.org/2000/svg","rect");
+        leak.setAttribute("x","140");
+        leak.setAttribute("y","5");
+        leak.setAttribute("width", String(290 * t));
+        leak.setAttribute("height","14");
+        leak.setAttribute("rx","7");
+        leak.setAttribute("fill", isSelected ? "rgba(255,255,255,.90)" : fill);
+
+        const drip = document.createElementNS("http://www.w3.org/2000/svg","path");
+        drip.setAttribute("d", `M430 12 C450 18, 460 26, 480 30`);
+        drip.setAttribute("fill","none");
+        drip.setAttribute("stroke", isSelected ? "rgba(255,255,255,.90)" : "rgba(255,255,255,.65)");
+        drip.setAttribute("stroke-width", String(leakW));
+        drip.setAttribute("stroke-linecap","round");
+        drip.setAttribute("opacity", "0.9");
+
+        const pct = document.createElementNS("http://www.w3.org/2000/svg","text");
+        pct.setAttribute("x","450");
+        pct.setAttribute("y","16");
+        pct.setAttribute("fill","rgba(255,255,255,.75)");
+        pct.setAttribute("font-size","12");
+        pct.setAttribute("font-family","ui-monospace, monospace");
+        pct.textContent = `${(s.rate*100).toFixed(1)}%`;
+
+        row.appendChild(label);
+        row.appendChild(pipe);
+        row.appendChild(leak);
+        row.appendChild(drip);
+        row.appendChild(pct);
+        g.appendChild(row);
+      });
+
+      const top = ranked[0];
+      $("topRisk").textContent = `Highest leak proxy: ${top.name} (${(top.rate*100).toFixed(1)}%) — ${top.note}`;
+    }
+
+    // --- staged visuals ---
+    function updateTank(betPerWeek, rate){
+      const maxBet = 200; // visual scale
+      const fillPct = clamp((betPerWeek || 0) / maxBet, 0, 1);
+
+      const h = 120 * fillPct;
+      $("tankFill").setAttribute("y", String(140 - h));
+      $("tankFill").setAttribute("height", String(h));
+
+      const showLeak = betPerWeek > 0;
+      $("leakPath").setAttribute("opacity", showLeak ? "0.9" : "0.0");
+      $("leakRateLabel").textContent = `lossRate: ${(rate*100).toFixed(1)}%`;
+
+      if (betPerWeek > 0){
+        const turnover = betPerWeek * 52;
+        $("betSummary").textContent = `Turnover ≈ £${turnover.toFixed(0)}/yr (from £${betPerWeek.toFixed(0)}/wk)`;
+      } else {
+        $("betSummary").textContent = `Enter bet/week to see turnover and leak.`;
+      }
+    }
+
+    function updateIncomeViz(income){
+      const max = 50000;
+      const w = 484 * clamp((income || 0) / max, 0, 1);
+      $("incomeBar").setAttribute("width", String(w));
+      $("incomeLabel").textContent = income > 0 ? `£${income.toFixed(0)}/yr` : "—";
+    }
+
+    // --- 3D tilt ---
+    function addTilt(card){
+      const onMove = (ev) => {
+        const r = card.getBoundingClientRect();
+        const x = (ev.clientX - r.left) / r.width - 0.5;
+        const y = (ev.clientY - r.top) / r.height - 0.5;
+        card.style.transform = `rotateX(${(-y*6).toFixed(2)}deg) rotateY(${(x*8).toFixed(2)}deg) translateZ(6px)`;
+      };
+      const onLeave = () => { card.style.transform = `rotateX(0deg) rotateY(0deg) translateZ(0px)`; };
+      card.addEventListener("mousemove", onMove);
+      card.addEventListener("mouseleave", onLeave);
+    }
+
+    // --- state ---
+    let betEnabled = false;
+
+    function setBetUI(){
+      $("betSwitch").classList.toggle("on", betEnabled);
+      $("betRow").style.display = betEnabled ? "flex" : "none";
+      if (!betEnabled) $("betPerWeek").value = "";
+    }
+
+    function recalc(){
+      const age = Number($("age").value);
+      const sex = $("sex").value;
+      const income = Number($("income").value);
+      const bet = betEnabled ? Number($("betPerWeek").value || 0) : 0;
+      const rate = Number($("edgePreset").value);
+
+      $("ageVal").textContent = String(age);
+
+      updateTank(bet, rate);
+      updateIncomeViz(income);
+
+      // demographics effect display
+      if (betEnabled && bet > 0){
+        $("demoEffect").textContent = "OFF";
+        $("demoEffect2").textContent = "bet/week ON → demographics do not change £";
+        $("demoKnob").setAttribute("cx","243");
+      } else {
+        $("demoEffect").textContent = "ON";
+        $("demoEffect2").textContent = "bet/week OFF → demographics influence fallback model";
+        $("demoKnob").setAttribute("cx","35");
+      }
+
+      // compute expected loss
+      let exp, modeLine;
+      let mix = pgsiMixAmongGamblers(age, sex); // always computed for consistency (even if not used for £)
+      if (betEnabled && bet > 0){
+        exp = expectedLossFromTurnover(bet, rate);
+        modeLine = `Mode: turnover × lossRate (${(rate*100).toFixed(1)}%)`;
+      } else {
+        exp = expectedLossDemographic(mix, income);
+        modeLine = `Mode: demographic fallback (no bet/week)`;
+      }
+
+      const capped = applyCaps(exp, income, bet);
+      exp = capped.value;
+
+      const [lo, hi] = outcomeBand(exp);
+
+      $("expLoss").textContent = fmtGBP0(exp);
+      $("band").textContent = `${fmtGBP0(lo)} — ${fmtGBP0(hi)} (loose band)`;
+
+      const pos = clamp((exp - lo) / (hi - lo), 0, 1);
+      $("posBar").style.width = (pos * 100).toFixed(1) + "%";
+
+      $("modeLine").textContent = modeLine;
+      $("capLine").textContent = `CAPS: ${capped.caps}`;
+
+      if (income > 0){
+        const pct = exp / income;
+        $("pctIncome").textContent = (pct * 100).toFixed(2) + "%";
+        $("pctBar").style.width = (clamp(pct / 0.12, 0, 1) * 100).toFixed(1) + "%";
+      } else {
+        $("pctIncome").textContent = "—";
+        $("pctBar").style.width = "0%";
+      }
+
+      // sports risk: highlight chosen rate
+      renderSportPipes(rate);
+      $("riskExplain").textContent = `Selected lossRate: ${(rate*100).toFixed(1)}% (used when bet/week ON)`;
+    }
+
+    // init
+    addTilt($("cBet")); addTilt($("vBet"));
+    addTilt($("cIncome")); addTilt($("vIncome"));
+    addTilt($("cDemo")); addTilt($("vDemo"));
+    addTilt($("cResult")); addTilt($("cSports"));
+
+    $("betSwitch").addEventListener("click", () => { betEnabled = !betEnabled; setBetUI(); recalc(); });
+    $("betPerWeek").addEventListener("input", recalc);
+    $("edgePreset").addEventListener("change", recalc);
+    $("income").addEventListener("input", recalc);
+    $("age").addEventListener("input", recalc);
+    $("sex").addEventListener("change", recalc);
+
+    setBetUI();
+    recalc();
+  </script>
+</body>
+</html>
