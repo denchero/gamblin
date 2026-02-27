@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Expected Gambling Loss — Story + Simulator</title>
+  <title>Expected Gambling Loss — Story + Fullscreen Race</title>
 
   <style>
     :root{
@@ -12,7 +12,6 @@
       --muted:rgba(255,255,255,.58);
       --muted2:rgba(255,255,255,.40);
       --line:rgba(255,255,255,.10);
-      --panel:rgba(10,10,10,.72);
       --shadow: 0 24px 70px rgba(0,0,0,.75);
       --r:18px;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
@@ -40,14 +39,7 @@
       z-index:0;
     }
 
-    .scene{
-      position:relative;
-      z-index:1;
-      perspective: 1200px;
-      transform-style:preserve-3d;
-    }
-
-    /* Story / scroll */
+    .scene{ position:relative; z-index:1; }
     .snap{
       height:100vh;
       overflow-y:auto;
@@ -64,7 +56,6 @@
       justify-content:center;
       padding: 26px 18px;
       position:relative;
-      transform-style:preserve-3d;
     }
 
     /* HUD */
@@ -99,10 +90,9 @@
       transition: width .25s ease;
     }
 
-    /* Layout blocks */
+    /* Title */
     .hero{
       width:min(980px, 100%);
-      transform: translateZ(40px);
     }
     .kicker{
       color:var(--muted);
@@ -113,9 +103,9 @@
     }
     h1{
       margin:0;
-      font-size: 30px;
+      font-size: 32px;
       line-height: 1.05;
-      font-weight: 860;
+      font-weight: 900;
       letter-spacing:.2px;
     }
     .sub{
@@ -143,162 +133,6 @@
       background: rgba(255,255,255,.78);
       box-shadow: 0 0 0 5px rgba(255,255,255,.08);
     }
-
-    .wrap{
-      width:min(1040px, 100%);
-      display:grid;
-      grid-template-columns: 420px 1fr;
-      gap: 14px;
-      align-items:start;
-    }
-    @media (max-width: 960px){
-      .wrap{ grid-template-columns: 1fr; }
-    }
-
-    .card{
-      border:1px solid var(--line);
-      border-radius: var(--r);
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      position:relative;
-      transform-style:preserve-3d;
-    }
-    .inner{ padding: 16px; }
-    .title{
-      margin:0 0 12px;
-      color:var(--muted);
-      font-weight: 800;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      font-size: 11px;
-      font-family: var(--sans);
-    }
-
-    label{ color:var(--muted); }
-    .row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin: 10px 0;
-    }
-    input[type="range"]{ width:100%; }
-    input[type="number"], select{
-      width: 190px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.55);
-      color:var(--fg);
-      outline:none;
-      font-family: var(--mono);
-    }
-
-    .toggle{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding: 10px 12px;
-      border:1px solid var(--line);
-      border-radius: 16px;
-      background: rgba(0,0,0,.35);
-      margin-top: 12px;
-    }
-    .toggle .left{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      min-width:0;
-    }
-    .toggle .left b{
-      font-size: 12px;
-      letter-spacing:.10em;
-      text-transform:uppercase;
-      color: var(--muted);
-      font-family: var(--sans);
-    }
-    .toggle .left span{
-      color: var(--muted2);
-      font-size: 12px;
-      font-family: var(--sans);
-    }
-    .switch{
-      position:relative;
-      width: 54px;
-      height: 30px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.08);
-      border:1px solid var(--line);
-      cursor:pointer;
-      flex:0 0 auto;
-    }
-    .switch i{
-      position:absolute;
-      top: 3px; left: 3px;
-      width: 24px; height: 24px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.92);
-      transition: transform .18s ease;
-      will-change: transform;
-    }
-    .switch.on i{ transform: translateX(24px); }
-
-    .split{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-      margin-top: 10px;
-    }
-    @media (max-width: 600px){
-      .split{ grid-template-columns: 1fr; }
-    }
-
-    .stat{
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.45);
-      border-radius: 16px;
-      padding: 12px;
-    }
-    .stat .k{ color:var(--muted); font-size: 12px; font-family: var(--sans); }
-    .stat .v{ font-size: 24px; font-weight: 900; margin-top: 2px; letter-spacing:.2px; font-family: var(--mono); }
-    .stat .s{ color:var(--muted2); font-size: 12px; margin-top: 4px; font-family: var(--mono); }
-
-    .bar{
-      height: 10px;
-      border-radius: 999px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.06);
-      overflow:hidden;
-      margin-top: 10px;
-    }
-    .bar > i{
-      display:block;
-      height:100%;
-      width:0%;
-      background: rgba(255,255,255,.80);
-      transition: width .35s ease;
-    }
-
-    .note{
-      color:var(--muted2);
-      font-size: 12px;
-      margin-top: 12px;
-      line-height:1.55;
-      font-family: var(--sans);
-    }
-
-    .viz{
-      border:1px solid rgba(255,255,255,.08);
-      border-radius: 16px;
-      background: rgba(0,0,0,.35);
-      padding: 12px;
-      margin-top: 12px;
-      overflow:hidden;
-    }
-
-    /* Scroll hint */
     .scrollHint{
       position:absolute;
       left:50%;
@@ -313,7 +147,6 @@
       gap:10px;
       user-select:none;
       pointer-events:none;
-      font-family: var(--sans);
     }
     .scrollHint i{
       display:inline-block;
@@ -339,438 +172,634 @@
       100%{ opacity:.55; }
     }
 
-    /* 3D tilt */
-    .tilt{ transform: rotateX(0) rotateY(0) translateZ(0); will-change: transform; }
-
-    /* ---------- HORSE GAME (upgraded) ---------- */
-    .gameRow{
+    /* Cards */
+    .wrap{
+      width:min(1040px, 100%);
       display:grid;
       grid-template-columns: 1fr;
-      gap: 10px;
-      margin-top: 10px;
+      gap: 14px;
+      align-items:start;
     }
-    .gameControls{
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 900px){
+      .grid2{ grid-template-columns: 1fr; }
+    }
+    .card{
+      border:1px solid var(--line);
+      border-radius: var(--r);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .inner{ padding: 16px; }
+    .title{
+      margin:0 0 12px;
+      color:var(--muted);
+      font-weight: 800;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      font-size: 11px;
+    }
+
+    label{ color:var(--muted); font-size:12px; }
+    .row{
       display:flex;
-      gap:10px;
-      flex-wrap:wrap;
       align-items:center;
       justify-content:space-between;
-      border:1px solid rgba(255,255,255,.10);
+      gap:12px;
+      margin: 10px 0;
+    }
+    input[type="range"]{ width:100%; }
+    input[type="number"], select{
+      width: 220px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.55);
+      color:var(--fg);
+      outline:none;
+      font-family: var(--mono);
+    }
+    .toggle{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 10px 12px;
+      border:1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(0,0,0,.35);
+      margin-top: 12px;
+    }
+    .toggle .left{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-width:0;
+    }
+    .toggle .left b{
+      font-size: 12px;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      color: var(--muted);
+    }
+    .toggle .left span{
+      color: var(--muted2);
+      font-size: 12px;
+    }
+    .switch{
+      position:relative;
+      width: 54px;
+      height: 30px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border:1px solid var(--line);
+      cursor:pointer;
+      flex:0 0 auto;
+    }
+    .switch i{
+      position:absolute;
+      top: 3px; left: 3px;
+      width: 24px; height: 24px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      transition: transform .18s ease;
+      will-change: transform;
+    }
+    .switch.on i{ transform: translateX(24px); }
+
+    .note{
+      color:var(--muted2);
+      font-size: 12px;
+      margin-top: 12px;
+      line-height:1.55;
+    }
+
+    /* Result stats */
+    .split{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top: 10px;
+    }
+    @media (max-width: 600px){
+      .split{ grid-template-columns: 1fr; }
+    }
+    .stat{
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.45);
       border-radius: 16px;
       padding: 12px;
-      background: rgba(0,0,0,.40);
     }
-    .gameControls .left, .gameControls .right{
+    .stat .k{ color:var(--muted); font-size: 12px; }
+    .stat .v{ font-size: 28px; font-weight: 900; margin-top: 2px; letter-spacing:.2px; font-family: var(--mono); }
+    .stat .s{ color:var(--muted2); font-size: 12px; margin-top: 4px; font-family: var(--mono); }
+    .bar{
+      height: 10px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      overflow:hidden;
+      margin-top: 10px;
+    }
+    .bar > i{
+      display:block;
+      height:100%;
+      width:0%;
+      background: rgba(255,255,255,.80);
+      transition: width .35s ease;
+    }
+
+    /* Leak map */
+    .viz{
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      background: rgba(0,0,0,.35);
+      padding: 12px;
+      margin-top: 12px;
+      overflow:hidden;
+    }
+
+    /* ---------- FULLSCREEN HORSE GAME ---------- */
+    section.fullscreen{
+      padding:0;
+      align-items:stretch;
+      justify-content:stretch;
+    }
+    .raceShell{
+      width:100%;
+      height:100vh;
+      position:relative;
+      display:flex;
+      flex-direction:column;
+    }
+    .raceTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding: 14px 18px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(10px);
+      z-index:3;
+    }
+    .raceTop .brand{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-width: 0;
+    }
+    .raceTop .brand b{
+      font-family: var(--mono);
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      font-size: 12px;
+      color: rgba(255,255,255,.78);
+    }
+    .raceTop .brand span{
+      font-size: 12px;
+      color: rgba(255,255,255,.45);
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      max-width: 52ch;
+    }
+    .raceControls{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
       align-items:center;
+      justify-content:flex-end;
     }
     .btn{
       border:1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.05);
-      color: rgba(255,255,255,.85);
+      color: rgba(255,255,255,.90);
       border-radius: 999px;
       padding: 10px 12px;
       cursor:pointer;
       font-family: var(--mono);
       font-size: 12px;
+      user-select:none;
     }
     .btn:hover{ background: rgba(255,255,255,.08); }
+    .raceTop select, .raceTop input{
+      width:auto;
+      min-width: 120px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.55);
+      color: rgba(255,255,255,.90);
+      font-family: var(--mono);
+      outline:none;
+    }
 
-    .track{
+    .raceBody{
+      flex:1;
       position:relative;
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: 16px;
+      overflow:hidden;
       background:
-        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.01));
-      height: 260px;
+        radial-gradient(120% 90% at 50% 15%, rgba(255,255,255,.05), rgba(0,0,0,0) 55%),
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.0));
+    }
+
+    /* spectators */
+    .stands{
+      position:absolute;
+      inset:0 0 auto 0;
+      height: 30vh;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,0)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 2px, rgba(0,0,0,0) 2px 10px);
       overflow:hidden;
     }
-
-    /* cinematic vignette */
-    .track:before{
-      content:"";
-      position:absolute; inset:0;
-      background:
-        radial-gradient(60% 120% at 20% 50%, rgba(255,255,255,.05), transparent 55%),
-        radial-gradient(60% 120% at 80% 50%, rgba(0,0,0,.55), transparent 60%),
-        linear-gradient(90deg, rgba(0,0,0,.35), transparent 20%, transparent 80%, rgba(0,0,0,.35));
-      pointer-events:none;
+    .crowd{
+      position:absolute;
+      left:0; right:0; bottom: 14px;
+      height: 60%;
+      opacity:.75;
+    }
+    .crowd i{
+      position:absolute;
+      bottom:0;
+      width: 6px; height: 10px;
+      border-radius: 999px 999px 4px 4px;
+      background: rgba(255,255,255,.20);
+      animation: crowdBob 620ms ease-in-out infinite;
+    }
+    @keyframes crowdBob{
+      0%{ transform: translateY(0); opacity:.50; }
+      50%{ transform: translateY(-3px); opacity:.75; }
+      100%{ transform: translateY(0); opacity:.50; }
     }
 
+    .track{
+      position:absolute;
+      left:0; right:0;
+      bottom:0;
+      height: 70vh;
+      border-top:1px solid rgba(255,255,255,.10);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)),
+        radial-gradient(120% 90% at 50% 80%, rgba(0,0,0,.55), rgba(0,0,0,0) 60%);
+    }
+    .lanes{
+      position:absolute;
+      left:0; right:0; top:0; bottom:0;
+    }
     .lane{
       position:absolute; left:0; right:0;
-      height: 52px;
-      border-top: 1px solid rgba(255,255,255,.07);
+      height: 20%;
+      border-top:1px solid rgba(255,255,255,.08);
     }
+    .lane:nth-child(1){ top:0%; }
+    .lane:nth-child(2){ top:20%; }
+    .lane:nth-child(3){ top:40%; }
+    .lane:nth-child(4){ top:60%; }
+    .lane:nth-child(5){ top:80%; }
+
     .finish{
       position:absolute;
       top:0; bottom:0;
-      right: 150px;
-      width: 2px;
-      background: rgba(255,255,255,.30);
+      right: 220px;
+      width: 3px;
+      background: rgba(255,255,255,.40);
+      box-shadow: 0 0 0 6px rgba(255,255,255,.06);
     }
     .finish:after{
       content:"";
       position:absolute;
-      right:-10px; top:0; bottom:0;
-      width: 20px;
-      background:
-        repeating-linear-gradient(
-          180deg,
-          rgba(255,255,255,.22) 0 10px,
-          rgba(0,0,0,.00) 10px 20px
-        );
-      opacity:.35;
+      right:-12px; top:0; bottom:0;
+      width: 24px;
+      background: repeating-linear-gradient(
+        180deg,
+        rgba(255,255,255,.22) 0 12px,
+        rgba(0,0,0,0) 12px 24px
+      );
+      opacity:.40;
     }
 
-    .bookie{
+    /* bookie booth */
+    .bookieBooth{
       position:absolute;
-      top: 10px;
-      right: 10px;
-      width: 130px;
-      height: 240px;
-      border-radius: 16px;
+      top: 14px;
+      right: 14px;
+      width: 190px;
+      height: calc(100% - 28px);
+      border-radius: 20px;
       border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.55);
+      background: rgba(0,0,0,.52);
+      backdrop-filter: blur(8px);
       overflow:hidden;
+      z-index:2;
+    }
+    .bookieBooth .head{
+      padding: 12px 12px 10px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .bookieBooth .head b{
+      font-family: var(--mono);
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-size: 11px;
+      color: rgba(255,255,255,.75);
+    }
+    .bookieBooth .head span{
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(255,255,255,.55);
+    }
+    .bookieArt{
+      position:absolute;
+      left:0; right:0; bottom:0;
+      height: 62%;
       display:flex;
       align-items:flex-end;
       justify-content:center;
+      padding-bottom: 10px;
     }
-    .bookie svg{
-      width: 140px;
-      height: 240px;
-      display:block;
-      opacity:.95;
-    }
-    .bookieLabel{
-      position:absolute;
-      top: 10px; left: 10px;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: rgba(255,255,255,.60);
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      z-index:2;
-    }
-
-    .horseWrap{
-      position:absolute;
-      left: 14px;
-      width: 140px;
-      height: 40px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      font-family: var(--mono);
-      font-size: 12px;
-      color: rgba(255,255,255,.80);
-      will-change: transform;
-    }
-
-    .horseSvg{
-      width: 54px;
-      height: 24px;
-      overflow: visible;
-    }
-
-    /* gallop animation toggled with .run */
-    .horseWrap.run .body{
-      animation: bob 220ms infinite ease-in-out;
-      transform-origin: 10px 12px;
-    }
-    .horseWrap.run .legA{
-      animation: legA 160ms infinite ease-in-out;
-      transform-origin: 10px 18px;
-    }
-    .horseWrap.run .legB{
-      animation: legB 160ms infinite ease-in-out;
-      transform-origin: 10px 18px;
-    }
-    .horseWrap.run .tail{
-      animation: tail 240ms infinite ease-in-out;
-      transform-origin: 6px 12px;
-    }
-
-    @keyframes bob{
-      0%{ transform: translateY(0); }
-      50%{ transform: translateY(1.5px); }
-      100%{ transform: translateY(0); }
-    }
-    @keyframes legA{
-      0%{ transform: rotate(18deg); }
-      50%{ transform: rotate(-18deg); }
-      100%{ transform: rotate(18deg); }
-    }
-    @keyframes legB{
-      0%{ transform: rotate(-18deg); }
-      50%{ transform: rotate(18deg); }
-      100%{ transform: rotate(-18deg); }
-    }
-    @keyframes tail{
-      0%{ transform: rotate(10deg); }
-      50%{ transform: rotate(-10deg); }
-      100%{ transform: rotate(10deg); }
-    }
-
-    /* dust particles */
-    .dust{
-      position:absolute;
-      left: 10px;
-      width: 120px;
-      height: 52px;
-      pointer-events:none;
-      opacity:0;
-    }
-    .horseWrap.run + .dust{
-      opacity:1;
-    }
-    .dust i{
-      position:absolute;
-      bottom: 10px;
-      width: 6px; height: 6px;
-      border-radius:999px;
-      background: rgba(255,255,255,.14);
-      animation: dust 420ms infinite ease-out;
-    }
-    .dust i:nth-child(2){ left: 20px; animation-delay: 80ms; opacity:.8; }
-    .dust i:nth-child(3){ left: 34px; animation-delay: 160ms; opacity:.6; }
-    .dust i:nth-child(4){ left: 50px; animation-delay: 240ms; opacity:.5; }
-    @keyframes dust{
-      0%{ transform: translateX(0) translateY(0) scale(0.9); opacity:.45; }
-      100%{ transform: translateX(-24px) translateY(-10px) scale(1.2); opacity:0; }
-    }
-
-    /* money stream animation (created dynamically) */
-    .money{
-      position:absolute;
-      width: 10px;
-      height: 6px;
-      border-radius: 3px;
-      background: rgba(255,255,255,.82);
-      box-shadow: 0 0 0 1px rgba(255,255,255,.18);
-      pointer-events:none;
-      opacity:0;
-      will-change: transform, opacity;
-    }
-
-    /* bookie arm animation toggles */
-    .bookie.pay .arm{
-      animation: armPay 420ms ease-in-out 1;
-      transform-origin: 74px 126px;
-    }
-    .bookie.take .arm{
-      animation: armTake 420ms ease-in-out 1;
-      transform-origin: 74px 126px;
-    }
+    .bookieArt svg{ width: 220px; height: 320px; opacity:.95; }
+    .bookieBooth.pay .arm{ animation: armPay 420ms ease-in-out 1; transform-origin: 130px 140px; }
+    .bookieBooth.take .arm{ animation: armTake 420ms ease-in-out 1; transform-origin: 130px 140px; }
+    .bookieBooth.pay .cash{ animation: cashPulse 420ms ease-in-out 1; }
     @keyframes armPay{
       0%{ transform: rotate(0deg) translateX(0); }
-      50%{ transform: rotate(-12deg) translateX(-3px); }
+      50%{ transform: rotate(-14deg) translateX(-6px); }
       100%{ transform: rotate(0deg) translateX(0); }
     }
     @keyframes armTake{
       0%{ transform: rotate(0deg) translateX(0); }
-      50%{ transform: rotate(10deg) translateX(2px); }
+      50%{ transform: rotate(12deg) translateX(4px); }
       100%{ transform: rotate(0deg) translateX(0); }
     }
+    @keyframes cashPulse{
+      0%{ opacity:.55; transform: translateY(0); }
+      50%{ opacity:1; transform: translateY(-2px); }
+      100%{ opacity:.75; transform: translateY(0); }
+    }
 
-    .bank{
+    /* horses */
+    .horse{
+      position:absolute;
+      left: 18px;
+      width: 210px;
+      height: 70px;
       display:flex;
-      gap:12px;
-      flex-wrap:wrap;
       align-items:center;
       justify-content:space-between;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      z-index:1;
+      will-change: transform;
+      box-shadow: 0 16px 60px rgba(0,0,0,.55);
+    }
+    .horse .tag{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width:0;
+    }
+    .horse .tag b{
       font-family: var(--mono);
-      color: rgba(255,255,255,.70);
       font-size: 12px;
-      margin-top: 10px;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      color: rgba(255,255,255,.85);
+    }
+    .horse .tag span{
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(255,255,255,.55);
+    }
+    .horse .odds{
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(255,255,255,.80);
+    }
+    .horse svg{
+      width: 86px;
+      height: 44px;
+      overflow: visible;
     }
 
-    .bank strong{
-      color: rgba(255,255,255,.92);
-      font-weight: 800;
+    /* richer gallop */
+    .horse.run .body{ animation: bob 180ms infinite ease-in-out; transform-origin: 20px 20px; }
+    .horse.run .head{ animation: head 180ms infinite ease-in-out; transform-origin: 56px 18px; }
+    .horse.run .legA{ animation: legA 140ms infinite ease-in-out; transform-origin: 26px 38px; }
+    .horse.run .legB{ animation: legB 140ms infinite ease-in-out; transform-origin: 26px 38px; }
+    .horse.run .tail{ animation: tail 200ms infinite ease-in-out; transform-origin: 10px 22px; }
+    .horse.run .mane{ animation: mane 160ms infinite ease-in-out; transform-origin: 46px 12px; }
+
+    @keyframes bob{ 0%{ transform: translateY(0);} 50%{ transform: translateY(2px);} 100%{ transform: translateY(0);} }
+    @keyframes head{ 0%{ transform: rotate(2deg);} 50%{ transform: rotate(-2deg);} 100%{ transform: rotate(2deg);} }
+    @keyframes legA{ 0%{ transform: rotate(18deg);} 50%{ transform: rotate(-18deg);} 100%{ transform: rotate(18deg);} }
+    @keyframes legB{ 0%{ transform: rotate(-18deg);} 50%{ transform: rotate(18deg);} 100%{ transform: rotate(-18deg);} }
+    @keyframes tail{ 0%{ transform: rotate(10deg);} 50%{ transform: rotate(-10deg);} 100%{ transform: rotate(10deg);} }
+    @keyframes mane{ 0%{ transform: translateY(0);} 50%{ transform: translateY(1px);} 100%{ transform: translateY(0);} }
+
+    /* dust */
+    .dust{
+      position:absolute;
+      width: 160px; height: 80px;
+      left: 0;
+      pointer-events:none;
+      opacity:0;
+      z-index:0;
     }
+    .dust i{
+      position:absolute;
+      bottom: 12px;
+      width: 8px; height: 8px;
+      border-radius:999px;
+      background: rgba(255,255,255,.12);
+      animation: dust 420ms infinite ease-out;
+    }
+    @keyframes dust{
+      0%{ transform: translateX(0) translateY(0) scale(0.9); opacity:.35; }
+      100%{ transform: translateX(-36px) translateY(-14px) scale(1.3); opacity:0; }
+    }
+
+    .horse.run + .dust{ opacity:1; }
+
+    /* money particles */
+    .money{
+      position:absolute;
+      width: 14px;
+      height: 8px;
+      border-radius: 3px;
+      background: rgba(255,255,255,.86);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.18);
+      pointer-events:none;
+      opacity:0;
+      will-change: transform, opacity;
+      z-index:3;
+    }
+
+    /* confetti on win */
+    .confetti{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      z-index:4;
+      opacity:0;
+      transition: opacity 160ms ease;
+    }
+    .confetti.on{ opacity:1; }
+    .confetti i{
+      position:absolute;
+      top:-10px;
+      width: 10px; height: 6px;
+      border-radius: 2px;
+      opacity:.9;
+      animation: confettiFall 900ms ease-in forwards;
+    }
+    @keyframes confettiFall{
+      0%{ transform: translateY(0) rotate(0deg); opacity:0.0; }
+      10%{ opacity:.95; }
+      100%{ transform: translateY(85vh) rotate(240deg); opacity:0; }
+    }
+
+    /* bottom stats strip */
+    .raceBottom{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding: 12px 18px;
+      border-top:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(10px);
+      z-index:3;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(255,255,255,.70);
+      flex-wrap:wrap;
+    }
+    .raceBottom strong{ color: rgba(255,255,255,.92); }
+
+    /* colored horses only (rest stays b/w) */
+    .c1{ --hc:#ff4d4d; }
+    .c2{ --hc:#4dd2ff; }
+    .c3{ --hc:#ffe14d; }
+    .c4{ --hc:#a84dff; }
+    .c5{ --hc:#4dff88; }
+
+    .horse .sil{ fill: color-mix(in srgb, var(--hc) 78%, white 22%); }
+    .horse .sil2{ fill: color-mix(in srgb, var(--hc) 55%, black 45%); opacity:.9; }
+    .horse .stroke{ stroke: rgba(255,255,255,.24); }
+
   </style>
 </head>
 
 <body>
-  <!-- HUD -->
   <div class="hud" aria-hidden="true">
     <span class="dot"></span>
-    <span class="t" id="hudText">CHAPTER 1 / 6</span>
+    <span class="t" id="hudText">PAGE 1 / 4</span>
     <span class="bar"><i id="hudBar"></i></span>
   </div>
 
   <div class="scene">
     <div class="snap" id="snap">
 
-      <!-- 1: Intro -->
-      <section data-chapter="1">
+      <!-- PAGE 1: Title -->
+      <section data-page="1">
         <div class="hero">
-          <div class="kicker">Story mode • scroll to progress</div>
-          <h1>Money doesn’t vanish.<br/>It leaks.</h1>
+          <div class="kicker">Minimal • black & white • scroll</div>
+          <h1>Expected gambling loss.<br/>Told like a story.</h1>
           <div class="sub">
-            Feed the model in stages. If you provide <span style="font-family:var(--mono)">bet/week</span>, the £ result is driven by wager maths — not age or gender.
+            If you enter <span style="font-family:var(--mono)">stake/week</span>, the £ estimate is driven by maths (edge × turnover),
+            not “being lucky” because of age/sex.
           </div>
           <div class="pill"><span class="pDot"></span> ASSUMPTION: gambles this year</div>
         </div>
         <div class="scrollHint"><i></i> scroll</div>
       </section>
 
-      <!-- 2: Bet/week -->
-      <section data-chapter="2">
+      <!-- PAGE 2: Inputs (all together) -->
+      <section data-page="2">
         <div class="wrap">
-          <div class="card tilt" id="cBet">
+          <div class="card">
             <div class="inner">
-              <div class="title">Stage 1 — How much do you stake?</div>
+              <div class="title">Inputs</div>
 
               <div class="toggle">
                 <div class="left">
-                  <b>Use bet/week</b>
-                  <span>Turns on behavior-driven estimate (age/sex won’t change £).</span>
+                  <b>Use stake/week</b>
+                  <span>When ON, stake/week drives the £ result.</span>
                 </div>
-                <div class="switch" id="betSwitch" role="button" aria-label="Toggle bet/week"><i></i></div>
+                <div class="switch" id="betSwitch" role="button" aria-label="Toggle stake/week"><i></i></div>
               </div>
 
-              <div class="row" id="betRow" style="display:none; margin-top:12px;">
-                <label for="betPerWeek">Bet/week (£)</label>
-                <input id="betPerWeek" type="number" min="0" step="5" placeholder="e.g. 50" />
+              <div class="grid2">
+                <div>
+                  <div class="row" id="betRow" style="display:none; margin-top:12px;">
+                    <label for="betPerWeek">Stake/week (£)</label>
+                    <input id="betPerWeek" type="number" min="0" step="5" placeholder="e.g. 50" />
+                  </div>
+
+                  <div class="row" style="margin-top:12px;">
+                    <label for="sportKey">Bet type</label>
+                    <select id="sportKey">
+                      <option value="soccer">Soccer-like</option>
+                      <option value="tennis">Tennis-like</option>
+                      <option value="racing">Horse-racing-like</option>
+                      <option value="greyhound">Greyhound-like</option>
+                    </select>
+                  </div>
+
+                  <div class="row">
+                    <label for="income">Disposable income (£/year)</label>
+                    <input id="income" type="number" min="0" step="50" value="20000" />
+                  </div>
+                </div>
+
+                <div>
+                  <div class="row">
+                    <label for="age">Age</label>
+                    <div style="font-family:var(--mono)" id="ageVal">30</div>
+                  </div>
+                  <input id="age" type="range" min="18" max="90" value="30" />
+
+                  <div class="row" style="margin-top:12px;">
+                    <label for="sex">Sex</label>
+                    <select id="sex">
+                      <option value="male">male</option>
+                      <option value="female">female</option>
+                    </select>
+                  </div>
+
+                  <div class="note" id="inputNote">
+                    Tip: if stake/week is OFF, the model uses a demographic fallback. If it’s ON, stake/week dominates the £ result.
+                  </div>
+                </div>
               </div>
 
-              <div class="row" style="margin-top:12px;">
-                <label for="sportKey">Bet type</label>
-                <select id="sportKey" aria-label="Loss-rate preset">
-                  <option value="soccer">Soccer-like</option>
-                  <option value="tennis">Tennis-like</option>
-                  <option value="racing">Horse-racing-like</option>
-                  <option value="greyhound">Greyhound-like</option>
-                </select>
-              </div>
-
-              <div class="note">
-                “Bet type” is a long-run expected loss rate proxy (margin / realized loss rate).
-              </div>
-            </div>
-          </div>
-
-          <div class="card tilt" id="vBet">
-            <div class="inner">
-              <div class="title">Turnover</div>
-              <div class="viz">
-                <svg viewBox="0 0 520 180" width="100%" height="180" aria-label="Turnover tank">
-                  <rect x="18" y="20" width="300" height="120" rx="18" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="2"/>
-                  <rect x="18" y="20" width="300" height="120" rx="18" fill="rgba(255,255,255,.05)"/>
-                  <text x="28" y="54" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">TURNOVER</text>
-
-                  <clipPath id="tankClip"><rect x="18" y="20" width="300" height="120" rx="18"/></clipPath>
-                  <rect id="tankFill" x="18" y="140" width="300" height="0" fill="rgba(255,255,255,.75)" clip-path="url(#tankClip)"/>
-
-                  <rect x="340" y="68" width="90" height="20" rx="10" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.22)"/>
-                  <circle cx="338" cy="78" r="12" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.22)"/>
-
-                  <path id="leakPath" d="M430 78 C460 90, 470 110, 492 132" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-linecap="round" opacity="0.0"/>
-                  <text x="340" y="52" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">LEAK RATE</text>
-                  <text id="leakRateLabel" x="340" y="112" fill="rgba(255,255,255,.85)" font-size="14" font-family="ui-monospace, monospace">—</text>
-                </svg>
-              </div>
-
-              <div class="note" style="font-family:var(--mono)" id="betSummary">Toggle bet/week to see turnover fill.</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 3: Income -->
-      <section data-chapter="3">
-        <div class="wrap">
-          <div class="card tilt" id="cIncome">
-            <div class="inner">
-              <div class="title">Stage 2 — Disposable income</div>
-              <div class="row">
-                <label for="income">Disposable income (£/year)</label>
-                <input id="income" type="number" min="0" step="50" value="20000" />
-              </div>
-              <div class="note">Guardrails prevent absurd outputs when income is tiny.</div>
-            </div>
-          </div>
-
-          <div class="card tilt" id="vIncome">
-            <div class="inner">
-              <div class="title">Budget rail</div>
-              <div class="viz">
-                <svg viewBox="0 0 520 180" width="100%" height="180" aria-label="Budget rail">
-                  <text x="18" y="32" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">DISPOSABLE INCOME</text>
-                  <rect x="18" y="56" width="484" height="16" rx="8" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.12)"/>
-                  <rect id="incomeBar" x="18" y="56" width="0" height="16" rx="8" fill="rgba(255,255,255,.75)"/>
-                  <text id="incomeLabel" x="18" y="104" fill="rgba(255,255,255,.85)" font-size="16" font-family="ui-monospace, monospace">—</text>
-                  <text x="18" y="136" fill="rgba(255,255,255,.45)" font-size="12" font-family="ui-monospace, monospace">
-                    (scaled to £0 → £50k for display)
-                  </text>
-                </svg>
+              <div class="note" style="margin-top:14px;">
+                Scroll to see the result and what it means.
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- 4: Demographics -->
-      <section data-chapter="4">
+      <!-- PAGE 3: Final + explanation underneath -->
+      <section data-page="3">
         <div class="wrap">
-          <div class="card tilt" id="cDemo">
-            <div class="inner">
-              <div class="title">Stage 3 — Demographics</div>
-
-              <div class="row">
-                <label for="age">Age</label>
-                <div style="font-family:var(--mono)" id="ageVal">30</div>
-              </div>
-              <input id="age" type="range" min="18" max="90" value="30" />
-
-              <div class="row" style="margin-top:12px;">
-                <label for="sex">Sex</label>
-                <select id="sex">
-                  <option value="male">male</option>
-                  <option value="female">female</option>
-                </select>
-              </div>
-
-              <div class="note" id="demoNote">
-                If bet/week is ON, these do not change the £ outcome.
-              </div>
-            </div>
-          </div>
-
-          <div class="card tilt" id="vDemo">
-            <div class="inner">
-              <div class="title">Impact switch</div>
-              <div class="viz">
-                <svg viewBox="0 0 520 180" width="100%" height="180" aria-label="Demographic effect">
-                  <text x="18" y="32" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">EFFECT ON £ OUTCOME</text>
-                  <text id="demoEffect" x="18" y="72" fill="rgba(255,255,255,.88)" font-size="22" font-family="ui-monospace, monospace">—</text>
-                  <text id="demoEffect2" x="18" y="102" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">—</text>
-
-                  <rect x="18" y="126" width="300" height="34" rx="17" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.12)"/>
-                  <circle id="demoKnob" cx="35" cy="143" r="12" fill="rgba(255,255,255,.85)"/>
-                  <text x="64" y="148" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">
-                    bet/week OFF → demographics ON
-                  </text>
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 5: Result -->
-      <section data-chapter="5">
-        <div class="wrap">
-          <div class="card tilt" id="cResult">
+          <div class="card">
             <div class="inner">
               <div class="title">Final — What leaks out?</div>
 
@@ -792,246 +821,274 @@
 
               <div class="note" style="font-family:var(--mono)" id="capLine">CAPS: —</div>
               <div class="note" id="bananaLine">You could buy: —</div>
-              <div class="note">Banana math is intentionally dumb: it’s for intuition, not economics.</div>
-            </div>
-          </div>
-
-          <div class="card tilt" id="cSports">
-            <div class="inner">
-              <div class="title">Where you’re most likely to leak money</div>
-              <div class="note" style="margin-top:-4px;">“Leak size” = expected loss-rate proxy. Higher = worse value on average.</div>
 
               <div class="viz">
                 <svg viewBox="0 0 520 220" width="100%" height="220" aria-label="Leak map">
-                  <text x="18" y="30" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">LEAK MAP</text>
+                  <text x="18" y="30" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">WHERE YOU’RE MOST LIKELY TO LEAK MONEY</text>
                   <g id="sportPipes" transform="translate(18,52)"></g>
                   <text id="riskExplain" x="18" y="206" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">—</text>
                 </svg>
               </div>
 
               <div class="note" style="font-family:var(--mono)" id="topRisk">—</div>
+
+              <!-- EXPLANATIONS BELOW (as requested) -->
+              <div class="note" id="explainBlock">
+                <b style="color:rgba(255,255,255,.78); font-family:var(--mono); letter-spacing:.10em; text-transform:uppercase; font-size:11px;">How this works</b><br/><br/>
+                <span style="color:rgba(255,255,255,.62)">
+                  • If <span style="font-family:var(--mono)">stake/week</span> is ON and > 0, expected loss ≈ <span style="font-family:var(--mono)">stake/week × 52 × lossRate</span>.<br/>
+                  • If stake/week is OFF, the model uses a demographic fallback (coarse risk-banding), so age/sex can change the estimate.<br/>
+                  • Disposable income applies guardrails so tiny incomes don’t produce absurd losses.
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- 6: Horse simulator -->
-      <section data-chapter="6">
-        <div class="wrap">
-          <div class="card tilt" id="cGame">
-            <div class="inner">
-              <div class="title">Bonus — Horse racing simulator</div>
-              <div class="note" style="margin-top:-4px;">Pick a horse. Bet. Watch the bookie win in the long run.</div>
+      <!-- PAGE 4: Fullscreen horse game -->
+      <section class="fullscreen" data-page="4">
+        <div class="raceShell">
+          <div class="raceTop">
+            <div class="brand">
+              <b>Horse racing simulator</b>
+              <span>Over enough races, the book wins (overround & negative EV).</span>
+            </div>
 
-              <div class="gameRow">
-                <div class="gameControls">
-                  <div class="left">
-                    <label>Pick</label>
-                    <select id="pickHorse" style="width:160px;">
-                      <option value="0">Horse 1</option>
-                      <option value="1">Horse 2</option>
-                      <option value="2">Horse 3</option>
-                      <option value="3">Horse 4</option>
-                      <option value="4">Horse 5</option>
-                    </select>
+            <div class="raceControls">
+              <select id="pickHorse">
+                <option value="0">Pick: Horse 1</option>
+                <option value="1">Pick: Horse 2</option>
+                <option value="2">Pick: Horse 3</option>
+                <option value="3">Pick: Horse 4</option>
+                <option value="4">Pick: Horse 5</option>
+              </select>
 
-                    <label>Stake (£)</label>
-                    <input id="stake" type="number" min="1" step="1" value="5" style="width:110px;" />
+              <input id="stake" type="number" min="1" step="1" value="5" />
 
-                    <label>Overround</label>
-                    <select id="overround" style="width:140px;">
-                      <option value="1.05">105% (tight)</option>
-                      <option value="1.12" selected>112% (typical-ish)</option>
-                      <option value="1.20">120% (fat book)</option>
-                    </select>
-                  </div>
+              <select id="overround">
+                <option value="1.05">Overround 105%</option>
+                <option value="1.12" selected>Overround 112%</option>
+                <option value="1.20">Overround 120%</option>
+              </select>
 
-                  <div class="right">
-                    <button class="btn" id="raceBtn">Run 1 race</button>
-                    <button class="btn" id="sim1kBtn">Run 1,000</button>
-                    <button class="btn" id="sim10kBtn">Run 10,000</button>
-                    <button class="btn" id="resetBankBtn">Reset</button>
-                  </div>
-                </div>
-
-                <div class="track" id="track">
-                  <div class="finish"></div>
-
-                  <div class="bookie" id="bookie">
-                    <div class="bookieLabel" id="oddsBanner">Overround: —</div>
-                    <!-- bookie booth + character -->
-                    <svg viewBox="0 0 140 240" aria-label="Bookie">
-                      <!-- booth -->
-                      <rect x="10" y="30" width="120" height="170" rx="14" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.12)"/>
-                      <rect x="10" y="160" width="120" height="40" rx="12" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.12)"/>
-                      <text x="24" y="56" fill="rgba(255,255,255,.55)" font-size="10" font-family="ui-monospace, monospace">BOOKIE</text>
-                      <!-- head -->
-                      <circle cx="74" cy="92" r="16" fill="rgba(255,255,255,.82)"/>
-                      <!-- hat -->
-                      <rect x="58" y="72" width="32" height="10" rx="4" fill="rgba(255,255,255,.25)"/>
-                      <rect x="54" y="80" width="40" height="6" rx="3" fill="rgba(255,255,255,.18)"/>
-                      <!-- body -->
-                      <rect x="60" y="110" width="28" height="32" rx="10" fill="rgba(255,255,255,.25)"/>
-                      <!-- arm -->
-                      <rect class="arm" x="84" y="118" width="30" height="8" rx="4" fill="rgba(255,255,255,.35)"/>
-                      <!-- money stack -->
-                      <rect x="94" y="174" width="24" height="10" rx="3" fill="rgba(255,255,255,.20)"/>
-                      <rect x="92" y="182" width="28" height="10" rx="3" fill="rgba(255,255,255,.26)"/>
-                      <rect x="90" y="190" width="32" height="10" rx="3" fill="rgba(255,255,255,.32)"/>
-                      <!-- eyes -->
-                      <circle cx="69" cy="90" r="2" fill="rgba(0,0,0,.7)"/>
-                      <circle cx="79" cy="90" r="2" fill="rgba(0,0,0,.7)"/>
-                    </svg>
-                  </div>
-
-                  <div class="lane" style="top:52px;"></div>
-                  <div class="lane" style="top:104px;"></div>
-                  <div class="lane" style="top:156px;"></div>
-                  <div class="lane" style="top:208px;"></div>
-
-                  <!-- horses (SVG + dust) -->
-                  <div class="horseWrap" id="h0" style="top:10px;">
-                    <span>H1</span>
-                    <svg class="horseSvg" viewBox="0 0 60 28" aria-hidden="true">
-                      <g class="body">
-                        <ellipse cx="28" cy="14" rx="12" ry="8" fill="rgba(255,255,255,.78)"/>
-                        <circle cx="41" cy="12" r="5" fill="rgba(255,255,255,.78)"/>
-                        <rect x="18" y="6" width="6" height="8" rx="3" fill="rgba(255,255,255,.55)"/>
-                        <g class="tail">
-                          <path d="M16 14 C10 10, 10 18, 16 16" stroke="rgba(255,255,255,.55)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                        </g>
-                        <g class="legA">
-                          <path d="M24 20 L20 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M32 20 L28 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
-                        </g>
-                        <g class="legB">
-                          <path d="M28 20 L24 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M36 20 L32 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
-                        </g>
-                      </g>
-                    </svg>
-                    <span id="o0">—</span>
-                  </div>
-                  <div class="dust"><i style="left:14px"></i><i></i><i></i><i></i></div>
-
-                  <div class="horseWrap" id="h1" style="top:62px;">
-                    <span>H2</span>
-                    <svg class="horseSvg" viewBox="0 0 60 28" aria-hidden="true">
-                      <g class="body">
-                        <ellipse cx="28" cy="14" rx="12" ry="8" fill="rgba(255,255,255,.78)"/>
-                        <circle cx="41" cy="12" r="5" fill="rgba(255,255,255,.78)"/>
-                        <rect x="18" y="6" width="6" height="8" rx="3" fill="rgba(255,255,255,.55)"/>
-                        <g class="tail">
-                          <path d="M16 14 C10 10, 10 18, 16 16" stroke="rgba(255,255,255,.55)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                        </g>
-                        <g class="legA">
-                          <path d="M24 20 L20 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M32 20 L28 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
-                        </g>
-                        <g class="legB">
-                          <path d="M28 20 L24 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M36 20 L32 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
-                        </g>
-                      </g>
-                    </svg>
-                    <span id="o1">—</span>
-                  </div>
-                  <div class="dust"><i style="left:14px"></i><i></i><i></i><i></i></div>
-
-                  <div class="horseWrap" id="h2" style="top:114px;">
-                    <span>H3</span>
-                    <svg class="horseSvg" viewBox="0 0 60 28" aria-hidden="true">
-                      <g class="body">
-                        <ellipse cx="28" cy="14" rx="12" ry="8" fill="rgba(255,255,255,.78)"/>
-                        <circle cx="41" cy="12" r="5" fill="rgba(255,255,255,.78)"/>
-                        <rect x="18" y="6" width="6" height="8" rx="3" fill="rgba(255,255,255,.55)"/>
-                        <g class="tail">
-                          <path d="M16 14 C10 10, 10 18, 16 16" stroke="rgba(255,255,255,.55)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                        </g>
-                        <g class="legA">
-                          <path d="M24 20 L20 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M32 20 L28 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
-                        </g>
-                        <g class="legB">
-                          <path d="M28 20 L24 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M36 20 L32 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
-                        </g>
-                      </g>
-                    </svg>
-                    <span id="o2">—</span>
-                  </div>
-                  <div class="dust"><i style="left:14px"></i><i></i><i></i><i></i></div>
-
-                  <div class="horseWrap" id="h3" style="top:166px;">
-                    <span>H4</span>
-                    <svg class="horseSvg" viewBox="0 0 60 28" aria-hidden="true">
-                      <g class="body">
-                        <ellipse cx="28" cy="14" rx="12" ry="8" fill="rgba(255,255,255,.78)"/>
-                        <circle cx="41" cy="12" r="5" fill="rgba(255,255,255,.78)"/>
-                        <rect x="18" y="6" width="6" height="8" rx="3" fill="rgba(255,255,255,.55)"/>
-                        <g class="tail">
-                          <path d="M16 14 C10 10, 10 18, 16 16" stroke="rgba(255,255,255,.55)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                        </g>
-                        <g class="legA">
-                          <path d="M24 20 L20 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M32 20 L28 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
-                        </g>
-                        <g class="legB">
-                          <path d="M28 20 L24 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M36 20 L32 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
-                        </g>
-                      </g>
-                    </svg>
-                    <span id="o3">—</span>
-                  </div>
-                  <div class="dust"><i style="left:14px"></i><i></i><i></i><i></i></div>
-
-                  <div class="horseWrap" id="h4" style="top:218px;">
-                    <span>H5</span>
-                    <svg class="horseSvg" viewBox="0 0 60 28" aria-hidden="true">
-                      <g class="body">
-                        <ellipse cx="28" cy="14" rx="12" ry="8" fill="rgba(255,255,255,.78)"/>
-                        <circle cx="41" cy="12" r="5" fill="rgba(255,255,255,.78)"/>
-                        <rect x="18" y="6" width="6" height="8" rx="3" fill="rgba(255,255,255,.55)"/>
-                        <g class="tail">
-                          <path d="M16 14 C10 10, 10 18, 16 16" stroke="rgba(255,255,255,.55)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                        </g>
-                        <g class="legA">
-                          <path d="M24 20 L20 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M32 20 L28 26" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
-                        </g>
-                        <g class="legB">
-                          <path d="M28 20 L24 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M36 20 L32 26" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
-                        </g>
-                      </g>
-                    </svg>
-                    <span id="o4">—</span>
-                  </div>
-                  <div class="dust"><i style="left:14px"></i><i></i><i></i><i></i></div>
-
-                </div>
-
-                <div class="bank">
-                  <div>Bankroll: <strong id="bank">£100.00</strong></div>
-                  <div>Races: <strong id="races">0</strong></div>
-                  <div>ROI: <strong id="roi">0.00%</strong></div>
-                  <div id="lastResult">Last: —</div>
-                </div>
-
-                <div class="note">
-                  The “house edge” comes from overround: bookmaker-implied probabilities sum to > 1.
-                </div>
-              </div>
+              <button class="btn" id="raceBtn">Run 1 race</button>
+              <button class="btn" id="sim1kBtn">Run 1,000</button>
+              <button class="btn" id="sim10kBtn">Run 10,000</button>
+              <button class="btn" id="resetBankBtn">Reset</button>
             </div>
           </div>
 
-          <div class="card tilt" id="cOutro">
-            <div class="inner">
-              <div class="title">Done</div>
-              <div class="sub" style="margin-top:0;">Over a big enough sample, the maths wins.</div>
-              <div class="pill"><span class="pDot"></span> scroll up and mess with it</div>
+          <div class="raceBody" id="raceBody">
+            <div class="stands">
+              <div class="crowd" id="crowd"></div>
             </div>
+
+            <div class="track" id="track">
+              <div class="lanes">
+                <div class="lane"></div><div class="lane"></div><div class="lane"></div><div class="lane"></div><div class="lane"></div>
+              </div>
+
+              <div class="finish"></div>
+
+              <div class="bookieBooth" id="bookie">
+                <div class="head">
+                  <b>BOOKIE</b>
+                  <span id="oddsBanner">Overround: —</span>
+                </div>
+                <div class="bookieArt">
+                  <!-- more detailed bookie (still vector) -->
+                  <svg viewBox="0 0 260 340" aria-label="Bookie">
+                    <!-- booth -->
+                    <rect x="35" y="60" width="190" height="240" rx="22" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.12)"/>
+                    <rect x="35" y="230" width="190" height="70" rx="18" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.12)"/>
+                    <text x="58" y="92" fill="rgba(255,255,255,.55)" font-size="12" font-family="ui-monospace, monospace">ODDS INSIDE</text>
+
+                    <!-- bookie person -->
+                    <circle cx="140" cy="140" r="22" fill="rgba(255,255,255,.82)"/>
+                    <rect x="116" y="164" width="48" height="56" rx="18" fill="rgba(255,255,255,.18)"/>
+                    <rect x="106" y="178" width="26" height="12" rx="6" fill="rgba(255,255,255,.14)"/>
+                    <rect x="148" y="178" width="26" height="12" rx="6" fill="rgba(255,255,255,.14)"/>
+
+                    <!-- hat -->
+                    <rect x="118" y="112" width="44" height="14" rx="6" fill="rgba(255,255,255,.22)"/>
+                    <rect x="112" y="124" width="56" height="8" rx="4" fill="rgba(255,255,255,.16)"/>
+
+                    <!-- arm -->
+                    <rect class="arm" x="164" y="188" width="62" height="14" rx="7" fill="rgba(255,255,255,.28)"/>
+
+                    <!-- cash tray -->
+                    <rect x="86" y="250" width="120" height="26" rx="12" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.10)"/>
+                    <g class="cash">
+                      <rect x="150" y="246" width="42" height="14" rx="4" fill="rgba(255,255,255,.18)"/>
+                      <rect x="146" y="256" width="50" height="14" rx="4" fill="rgba(255,255,255,.24)"/>
+                      <rect x="142" y="266" width="58" height="14" rx="4" fill="rgba(255,255,255,.32)"/>
+                    </g>
+
+                    <!-- eyes -->
+                    <circle cx="132" cy="138" r="3" fill="rgba(0,0,0,.72)"/>
+                    <circle cx="148" cy="138" r="3" fill="rgba(0,0,0,.72)"/>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Confetti -->
+              <div class="confetti" id="confetti"></div>
+
+              <!-- Horses + dust (colored) -->
+              <div class="horse c1" id="h0" style="top: 4%;">
+                <div class="tag"><b>H1</b><span id="o0">—</span></div>
+                <svg viewBox="0 0 90 48" aria-hidden="true">
+                  <g class="body">
+                    <ellipse class="sil" cx="40" cy="26" rx="18" ry="12"></ellipse>
+                    <g class="head">
+                      <ellipse class="sil" cx="62" cy="20" rx="9" ry="7"></ellipse>
+                      <circle class="sil2" cx="66" cy="18" r="2.2"></circle>
+                    </g>
+                    <g class="mane">
+                      <path d="M54 14 C48 16, 50 10, 44 12" class="stroke" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    </g>
+                    <g class="tail">
+                      <path d="M22 26 C14 20, 14 34, 22 30" class="stroke" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    </g>
+                    <g class="legA">
+                      <path d="M34 36 L28 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round"/>
+                      <path d="M46 36 L40 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    </g>
+                    <g class="legB">
+                      <path d="M38 36 L34 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round" opacity=".55"/>
+                      <path d="M50 36 L46 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round" opacity=".55"/>
+                    </g>
+                  </g>
+                </svg>
+                <div class="odds"> </div>
+              </div>
+              <div class="dust" style="top: 4%;"><i style="left:34px"></i><i style="left:58px; animation-delay:80ms"></i><i style="left:78px; animation-delay:160ms"></i></div>
+
+              <div class="horse c2" id="h1" style="top: 24%;">
+                <div class="tag"><b>H2</b><span id="o1">—</span></div>
+                <svg viewBox="0 0 90 48" aria-hidden="true">
+                  <g class="body">
+                    <ellipse class="sil" cx="40" cy="26" rx="18" ry="12"></ellipse>
+                    <g class="head">
+                      <ellipse class="sil" cx="62" cy="20" rx="9" ry="7"></ellipse>
+                      <circle class="sil2" cx="66" cy="18" r="2.2"></circle>
+                    </g>
+                    <g class="mane">
+                      <path d="M54 14 C48 16, 50 10, 44 12" class="stroke" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    </g>
+                    <g class="tail">
+                      <path d="M22 26 C14 20, 14 34, 22 30" class="stroke" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    </g>
+                    <g class="legA">
+                      <path d="M34 36 L28 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round"/>
+                      <path d="M46 36 L40 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    </g>
+                    <g class="legB">
+                      <path d="M38 36 L34 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round" opacity=".55"/>
+                      <path d="M50 36 L46 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round" opacity=".55"/>
+                    </g>
+                  </g>
+                </svg>
+                <div class="odds"> </div>
+              </div>
+              <div class="dust" style="top: 24%;"><i style="left:34px"></i><i style="left:58px; animation-delay:80ms"></i><i style="left:78px; animation-delay:160ms"></i></div>
+
+              <div class="horse c3" id="h2" style="top: 44%;">
+                <div class="tag"><b>H3</b><span id="o2">—</span></div>
+                <svg viewBox="0 0 90 48" aria-hidden="true">
+                  <g class="body">
+                    <ellipse class="sil" cx="40" cy="26" rx="18" ry="12"></ellipse>
+                    <g class="head">
+                      <ellipse class="sil" cx="62" cy="20" rx="9" ry="7"></ellipse>
+                      <circle class="sil2" cx="66" cy="18" r="2.2"></circle>
+                    </g>
+                    <g class="mane">
+                      <path d="M54 14 C48 16, 50 10, 44 12" class="stroke" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    </g>
+                    <g class="tail">
+                      <path d="M22 26 C14 20, 14 34, 22 30" class="stroke" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    </g>
+                    <g class="legA">
+                      <path d="M34 36 L28 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round"/>
+                      <path d="M46 36 L40 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    </g>
+                    <g class="legB">
+                      <path d="M38 36 L34 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round" opacity=".55"/>
+                      <path d="M50 36 L46 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round" opacity=".55"/>
+                    </g>
+                  </g>
+                </svg>
+                <div class="odds"> </div>
+              </div>
+              <div class="dust" style="top: 44%;"><i style="left:34px"></i><i style="left:58px; animation-delay:80ms"></i><i style="left:78px; animation-delay:160ms"></i></div>
+
+              <div class="horse c4" id="h3" style="top: 64%;">
+                <div class="tag"><b>H4</b><span id="o3">—</span></div>
+                <svg viewBox="0 0 90 48" aria-hidden="true">
+                  <g class="body">
+                    <ellipse class="sil" cx="40" cy="26" rx="18" ry="12"></ellipse>
+                    <g class="head">
+                      <ellipse class="sil" cx="62" cy="20" rx="9" ry="7"></ellipse>
+                      <circle class="sil2" cx="66" cy="18" r="2.2"></circle>
+                    </g>
+                    <g class="mane">
+                      <path d="M54 14 C48 16, 50 10, 44 12" class="stroke" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    </g>
+                    <g class="tail">
+                      <path d="M22 26 C14 20, 14 34, 22 30" class="stroke" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    </g>
+                    <g class="legA">
+                      <path d="M34 36 L28 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round"/>
+                      <path d="M46 36 L40 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    </g>
+                    <g class="legB">
+                      <path d="M38 36 L34 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round" opacity=".55"/>
+                      <path d="M50 36 L46 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round" opacity=".55"/>
+                    </g>
+                  </g>
+                </svg>
+                <div class="odds"> </div>
+              </div>
+              <div class="dust" style="top: 64%;"><i style="left:34px"></i><i style="left:58px; animation-delay:80ms"></i><i style="left:78px; animation-delay:160ms"></i></div>
+
+              <div class="horse c5" id="h4" style="top: 84%;">
+                <div class="tag"><b>H5</b><span id="o4">—</span></div>
+                <svg viewBox="0 0 90 48" aria-hidden="true">
+                  <g class="body">
+                    <ellipse class="sil" cx="40" cy="26" rx="18" ry="12"></ellipse>
+                    <g class="head">
+                      <ellipse class="sil" cx="62" cy="20" rx="9" ry="7"></ellipse>
+                      <circle class="sil2" cx="66" cy="18" r="2.2"></circle>
+                    </g>
+                    <g class="mane">
+                      <path d="M54 14 C48 16, 50 10, 44 12" class="stroke" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    </g>
+                    <g class="tail">
+                      <path d="M22 26 C14 20, 14 34, 22 30" class="stroke" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    </g>
+                    <g class="legA">
+                      <path d="M34 36 L28 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round"/>
+                      <path d="M46 36 L40 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    </g>
+                    <g class="legB">
+                      <path d="M38 36 L34 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round" opacity=".55"/>
+                      <path d="M50 36 L46 46" class="stroke" stroke-width="3" fill="none" stroke-linecap="round" opacity=".55"/>
+                    </g>
+                  </g>
+                </svg>
+                <div class="odds"> </div>
+              </div>
+              <div class="dust" style="top: 84%;"><i style="left:34px"></i><i style="left:58px; animation-delay:80ms"></i><i style="left:78px; animation-delay:160ms"></i></div>
+
+            </div>
+          </div>
+
+          <div class="raceBottom">
+            <div>Bankroll: <strong id="bank">£100.00</strong></div>
+            <div>Races: <strong id="races">0</strong></div>
+            <div>ROI: <strong id="roi">0.00%</strong></div>
+            <div id="lastResult">Last: —</div>
           </div>
         </div>
       </section>
@@ -1040,14 +1097,14 @@
   </div>
 
   <script>
-    // Banana stat: keep it dumb & stable
-    const BANANA_PRICE_GBP = 0.25; // rough “single banana” price for the joke
+    // --- Dumb banana joke (stable) ---
+    const BANANA_PRICE_GBP = 0.25;
     function bananasFromLoss(loss){
       const n = Math.max(0, Math.round(loss / BANANA_PRICE_GBP));
       return n.toLocaleString();
     }
 
-    // Fallback demographic anchors (used only if bet/week OFF)
+    // --- Fallback demographic anchors (only used if stake/week OFF) ---
     const LOSS_PGSI0   = 196.95;
     const LOSS_PGSI1_4 = 955.21;
     const LOSS_PGSI5P  = 2506.91;
@@ -1061,7 +1118,7 @@
     const YOUNG_MULT = 2.27;
     const OLD_MULT   = 0.11;
 
-    // Sport leak presets (keys avoid float-equality bugs)
+    // --- Leak presets (keys avoid float compare bugs) ---
     const SPORT_RISK = {
       soccer:    { name:"Soccer",    rate:0.078, note:"~7.8% leak proxy" },
       tennis:    { name:"Tennis",    rate:0.075, note:"~7.5% leak proxy" },
@@ -1074,11 +1131,11 @@
     const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
     const lerp = (a,b,t) => a + (b-a)*t;
 
-    // HUD + chapters
+    // --- HUD ---
     const snap = $("snap");
-    const sections = Array.from(document.querySelectorAll("section[data-chapter]"));
+    const pages = Array.from(document.querySelectorAll("section[data-page]"));
     const hudText = $("hudText");
-    const hudBar = $("hudBar");
+    const hudBar  = $("hudBar");
 
     function updateHUD(){
       const st = snap.scrollTop;
@@ -1086,28 +1143,15 @@
       hudBar.style.width = ((st / max) * 100).toFixed(1) + "%";
 
       let best = 0, bestDist = Infinity;
-      for (let i=0;i<sections.length;i++){
-        const d = Math.abs(sections[i].offsetTop - st);
+      for (let i=0;i<pages.length;i++){
+        const d = Math.abs(pages[i].offsetTop - st);
         if (d < bestDist){ bestDist = d; best = i; }
       }
-      hudText.textContent = `CHAPTER ${best+1} / ${sections.length}`;
+      hudText.textContent = `PAGE ${best+1} / ${pages.length}`;
     }
     snap.addEventListener("scroll", updateHUD, { passive:true });
 
-    // 3D tilt
-    function addTilt(card){
-      const onMove = (ev) => {
-        const r = card.getBoundingClientRect();
-        const x = (ev.clientX - r.left) / r.width - 0.5;
-        const y = (ev.clientY - r.top) / r.height - 0.5;
-        card.style.transform = `rotateX(${(-y*6).toFixed(2)}deg) rotateY(${(x*8).toFixed(2)}deg) translateZ(6px)`;
-      };
-      const onLeave = () => { card.style.transform = `rotateX(0deg) rotateY(0deg) translateZ(0px)`; };
-      card.addEventListener("mousemove", onMove);
-      card.addEventListener("mouseleave", onLeave);
-    }
-
-    // Model pieces
+    // --- Model ---
     let betEnabled = false;
 
     function pgsiMixAmongGamblers(age, sex){
@@ -1183,48 +1227,6 @@
     function outcomeBand(exp){ return [exp*0.4, exp*2.0]; }
     function fmtGBP0(x){ return "£" + x.toLocaleString(undefined, { maximumFractionDigits: 0 }); }
 
-    // Visual fixes
-    function updateTank(betPerWeek, rate){
-      const fill = $("tankFill");
-      const leakPath = $("leakPath");
-      const leakRateLabel = $("leakRateLabel");
-      const betSummary = $("betSummary");
-
-      if (!betEnabled){
-        fill.setAttribute("y","140");
-        fill.setAttribute("height","0");
-        leakPath.setAttribute("opacity","0.0");
-        leakRateLabel.textContent = "—";
-        betSummary.textContent = "Toggle bet/week to see turnover fill.";
-        return;
-      }
-
-      const bet = Math.max(0, betPerWeek || 0);
-      const turnover = bet * 52;
-
-      const maxBet = 250;
-      const pct = clamp(bet / maxBet, 0, 1);
-      const h = 120 * pct;
-
-      fill.setAttribute("y", String(140 - h));
-      fill.setAttribute("height", String(h));
-
-      const showLeak = bet > 0;
-      leakPath.setAttribute("opacity", showLeak ? "0.9" : "0.0");
-      leakRateLabel.textContent = `lossRate: ${(rate*100).toFixed(1)}%`;
-
-      betSummary.textContent = bet > 0
-        ? `Turnover ≈ £${turnover.toFixed(0)}/yr (from £${bet.toFixed(0)}/wk)`
-        : "Enter bet/week to see turnover and leak.";
-    }
-
-    function updateIncomeViz(income){
-      const max = 50000;
-      const w = 484 * clamp((income || 0) / max, 0, 1);
-      $("incomeBar").setAttribute("width", String(w));
-      $("incomeLabel").textContent = income > 0 ? `£${income.toFixed(0)}/yr` : "—";
-    }
-
     function renderSportPipes(selectedKey){
       const g = $("sportPipes");
       g.innerHTML = "";
@@ -1252,24 +1254,24 @@
         label.textContent = s.name;
 
         const pipe = document.createElementNS("http://www.w3.org/2000/svg","rect");
-        pipe.setAttribute("x","140");
+        pipe.setAttribute("x","170");
         pipe.setAttribute("y","5");
-        pipe.setAttribute("width","290");
+        pipe.setAttribute("width","250");
         pipe.setAttribute("height","14");
         pipe.setAttribute("rx","7");
         pipe.setAttribute("fill","rgba(255,255,255,.06)");
         pipe.setAttribute("stroke","rgba(255,255,255,.18)");
 
         const leak = document.createElementNS("http://www.w3.org/2000/svg","rect");
-        leak.setAttribute("x","140");
+        leak.setAttribute("x","170");
         leak.setAttribute("y","5");
-        leak.setAttribute("width", String(290 * t));
+        leak.setAttribute("width", String(250 * t));
         leak.setAttribute("height","14");
         leak.setAttribute("rx","7");
         leak.setAttribute("fill", s.key === selectedKey ? "rgba(255,255,255,.92)" : "rgba(255,255,255,.62)");
 
         const pct = document.createElementNS("http://www.w3.org/2000/svg","text");
-        pct.setAttribute("x","450");
+        pct.setAttribute("x","440");
         pct.setAttribute("y","16");
         pct.setAttribute("fill","rgba(255,255,255,.78)");
         pct.setAttribute("font-size","12");
@@ -1299,42 +1301,27 @@
       const sex = $("sex").value;
       const income = Number($("income").value);
       const bet = betEnabled ? Number($("betPerWeek").value || 0) : 0;
-
       const sportKey = $("sportKey").value;
       const rate = SPORT_RISK[sportKey].rate;
 
       $("ageVal").textContent = String(age);
-
-      updateIncomeViz(income);
-      updateTank(bet, rate);
       renderSportPipes(sportKey);
-
-      if (betEnabled && bet > 0){
-        $("demoEffect").textContent = "OFF";
-        $("demoEffect2").textContent = "bet/week ON → demographics do not change £";
-        $("demoKnob").setAttribute("cx","260");
-      } else {
-        $("demoEffect").textContent = "ON";
-        $("demoEffect2").textContent = "bet/week OFF → demographics influence fallback model";
-        $("demoKnob").setAttribute("cx","35");
-      }
 
       const mix = pgsiMixAmongGamblers(age, sex);
       let exp, modeLine;
 
       if (betEnabled && bet > 0){
         exp = expectedLossFromTurnover(bet, rate);
-        modeLine = `Mode: turnover × lossRate (${(rate*100).toFixed(1)}%)`;
+        modeLine = `Mode: stake/week × lossRate (${(rate*100).toFixed(1)}%)`;
       } else {
         exp = expectedLossDemographic(mix, income);
-        modeLine = `Mode: demographic fallback (no bet/week)`;
+        modeLine = `Mode: demographic fallback (stake/week OFF)`;
       }
 
       const capped = applyCaps(exp, income, bet);
       exp = capped.value;
 
       const [lo, hi] = outcomeBand(exp);
-
       $("expLoss").textContent = fmtGBP0(exp);
       $("band").textContent = `${fmtGBP0(lo)} — ${fmtGBP0(hi)} (loose band)`;
       $("modeLine").textContent = modeLine;
@@ -1355,7 +1342,7 @@
       $("bananaLine").innerHTML = `You could buy: <span style="font-family:var(--mono); color:rgba(255,255,255,.88)">${bananasFromLoss(exp)} bananas</span> 🍌`;
     }
 
-    // ---------- Horse game (visual upgrade + bookie money) ----------
+    // ----- Fullscreen Race Game -----
     let bank = 100;
     let races = 0;
     let totalStaked = 0;
@@ -1368,26 +1355,19 @@
       const s = g.reduce((a,b)=>a+b,0);
       return g.map(x=>x/s);
     }
-
     function computeBookOdds(overround){
       const q = trueProbs.map(p => p * overround);
       return q.map(x => 1 / x);
     }
-
     function fmtDecOdds(x){ return x.toFixed(2) + "x"; }
 
-    function updateGameOddsBanner(){
-      const ov = Number($("overround").value);
-      $("oddsBanner").textContent = `Overround: ${(ov*100).toFixed(0)}%`;
-    }
-
-    function updateGameOddsUI(){
+    function updateRaceUI(){
       $("o0").textContent = fmtDecOdds(bookOdds[0]);
       $("o1").textContent = fmtDecOdds(bookOdds[1]);
       $("o2").textContent = fmtDecOdds(bookOdds[2]);
       $("o3").textContent = fmtDecOdds(bookOdds[3]);
       $("o4").textContent = fmtDecOdds(bookOdds[4]);
-      updateGameOddsBanner();
+      $("oddsBanner").textContent = `Overround: ${(Number($("overround").value)*100).toFixed(0)}%`;
     }
 
     function chooseWinner(){
@@ -1397,15 +1377,15 @@
         cum += trueProbs[i];
         if (r <= cum) return i;
       }
-      return trueProbs.length - 1;
+      return 4;
     }
 
     function resetHorses(){
       for (let i=0;i<5;i++){
         const h = $("h"+i);
         h.classList.remove("run");
-        h.style.transform = `translateX(0px)`;
         h.style.transition = "";
+        h.style.transform = "translateX(0px)";
       }
     }
 
@@ -1413,25 +1393,31 @@
       document.querySelectorAll(".money").forEach(el => el.remove());
     }
 
-    function moneyStream(fromX, fromY, toX, toY, count, ms){
+    function moneyStream(fromEl, toEl, count, ms){
       const track = $("track");
-      const rect = track.getBoundingClientRect();
+      const tr = track.getBoundingClientRect();
+      const a = fromEl.getBoundingClientRect();
+      const b = toEl.getBoundingClientRect();
+
+      const fromX = a.left + a.width*0.5;
+      const fromY = a.top  + a.height*0.5;
+      const toX   = b.left + b.width*0.5;
+      const toY   = b.top  + b.height*0.5;
 
       for (let i=0;i<count;i++){
         const m = document.createElement("div");
         m.className = "money";
         track.appendChild(m);
 
-        const sx = fromX - rect.left + (Math.random()*10 - 5);
-        const sy = fromY - rect.top  + (Math.random()*10 - 5);
-        const tx = toX   - rect.left + (Math.random()*16 - 8);
-        const ty = toY   - rect.top  + (Math.random()*16 - 8);
+        const sx = fromX - tr.left + (Math.random()*12 - 6);
+        const sy = fromY - tr.top  + (Math.random()*12 - 6);
+        const tx = toX   - tr.left + (Math.random()*18 - 9);
+        const ty = toY   - tr.top  + (Math.random()*18 - 9);
 
-        const delay = i * (ms / count) * 0.18;
+        const delay = i * (ms / count) * 0.16;
 
         m.style.left = sx + "px";
         m.style.top  = sy + "px";
-        m.style.opacity = "0";
 
         requestAnimationFrame(() => {
           m.style.transition =
@@ -1440,14 +1426,28 @@
           m.style.transform = `translate(${(tx - sx).toFixed(0)}px, ${(ty - sy).toFixed(0)}px)`;
         });
 
-        // fade out near end
-        setTimeout(() => {
-          m.style.transition = `opacity 220ms ease`;
-          m.style.opacity = "0";
-        }, delay + ms - 220);
-
-        setTimeout(() => m.remove(), delay + ms + 260);
+        setTimeout(() => { m.style.opacity = "0"; }, delay + ms - 160);
+        setTimeout(() => m.remove(), delay + ms + 240);
       }
+    }
+
+    function popConfetti(){
+      const c = $("confetti");
+      c.innerHTML = "";
+      c.classList.add("on");
+      const colors = ["#ff4d4d","#4dd2ff","#ffe14d","#a84dff","#4dff88"];
+      for (let i=0;i<28;i++){
+        const p = document.createElement("i");
+        const left = Math.random()*100;
+        const delay = Math.random()*120;
+        const dur = 760 + Math.random()*420;
+        p.style.left = left + "%";
+        p.style.background = colors[i % colors.length];
+        p.style.animationDuration = dur + "ms";
+        p.style.animationDelay = delay + "ms";
+        c.appendChild(p);
+      }
+      setTimeout(() => c.classList.remove("on"), 1100);
     }
 
     function settleBet(pick, stake, winner){
@@ -1455,8 +1455,9 @@
       totalStaked += stake;
       bank -= stake;
 
-      let payout = 0;
       const win = (pick === winner);
+      let payout = 0;
+
       if (win){
         payout = stake * (bookOdds[winner] - 1);
         bank += stake + payout;
@@ -1472,31 +1473,18 @@
         ? `Last: WIN (Horse ${winner+1}) +£${payout.toFixed(2)}`
         : `Last: LOSS (Horse ${winner+1})`;
 
-      // bookie animation + money
       const bookie = $("bookie");
       bookie.classList.remove("pay","take");
-      void bookie.offsetWidth; // restart CSS animation
+      void bookie.offsetWidth;
 
-      const track = $("track").getBoundingClientRect();
-      const bookieRect = bookie.getBoundingClientRect();
-
-      // “player bank” target: use the bankroll text (approx)
-      const bankRect = $("bank").getBoundingClientRect();
-
+      const bankEl = $("bank");
       if (win){
         bookie.classList.add("pay");
-        moneyStream(
-          bookieRect.left + 40, bookieRect.top + 120,
-          bankRect.left + 20, bankRect.top + 10,
-          14, 650
-        );
+        moneyStream(bookie, bankEl, 18, 760);
+        popConfetti();
       } else {
         bookie.classList.add("take");
-        moneyStream(
-          bankRect.left + 20, bankRect.top + 10,
-          bookieRect.left + 40, bookieRect.top + 140,
-          10, 520
-        );
+        moneyStream(bankEl, bookie, 14, 620);
       }
     }
 
@@ -1505,20 +1493,20 @@
 
       const winner = chooseWinner();
       const track = $("track");
-      const finishX = track.clientWidth - 150 - 160; // finish line offset minus horse width-ish
-      const base = Math.max(120, finishX);
+      const finishX = track.clientWidth - 220 - 240; // finish line before bookie
+      const base = Math.max(240, finishX);
 
       const durations = [];
       for (let i=0;i<5;i++){
-        const noise = (Math.random() * 0.25) + 0.95;
+        const noise = (Math.random() * 0.26) + 0.95;
         const winBoost = (i === winner) ? 0.86 : 1.0;
-        durations[i] = 1300 * noise * winBoost;
+        durations[i] = 1700 * noise * winBoost;
       }
 
       for (let i=0;i<5;i++){
         const h = $("h"+i);
         h.classList.add("run");
-        h.style.transition = `transform ${durations[i].toFixed(0)}ms cubic-bezier(.2,.85,.2,1)`;
+        h.style.transition = `transform ${durations[i].toFixed(0)}ms cubic-bezier(.18,.88,.18,1)`;
         h.style.transform = `translateX(${base}px)`;
       }
 
@@ -1568,23 +1556,28 @@
       $("races").textContent = "0";
       $("roi").textContent = "0.00%";
       $("lastResult").textContent = "Last: —";
-
-      updateGameOddsUI();
+      updateRaceUI();
       clearMoney();
       resetHorses();
     }
 
-    function updateOverround(){
-      const ov = Number($("overround").value);
-      bookOdds = computeBookOdds(ov);
-      updateGameOddsUI();
+    // spectators
+    function buildCrowd(){
+      const crowd = $("crowd");
+      crowd.innerHTML = "";
+      const n = 140;
+      for (let i=0;i<n;i++){
+        const p = document.createElement("i");
+        p.style.left = (Math.random()*100) + "%";
+        p.style.height = (8 + Math.random()*14).toFixed(0) + "px";
+        p.style.width  = (4 + Math.random()*5).toFixed(0) + "px";
+        p.style.animationDelay = (Math.random()*520).toFixed(0) + "ms";
+        p.style.opacity = (0.25 + Math.random()*0.55).toFixed(2);
+        crowd.appendChild(p);
+      }
     }
 
-    // Wire UI
-    ["cBet","vBet","cIncome","vIncome","cDemo","vDemo","cResult","cSports","cGame","cOutro"]
-      .map($)
-      .forEach(addTilt);
-
+    // --- Wire inputs ---
     $("betSwitch").addEventListener("click", () => {
       betEnabled = !betEnabled;
       setBetUI();
@@ -1596,6 +1589,7 @@
     $("age").addEventListener("input", recalc);
     $("sex").addEventListener("change", recalc);
 
+    // --- Wire game ---
     $("raceBtn").addEventListener("click", () => {
       const pick = Number($("pickHorse").value);
       const stake = Math.max(1, Number($("stake").value || 1));
@@ -1604,11 +1598,16 @@
     $("sim1kBtn").addEventListener("click", () => runSim(1000));
     $("sim10kBtn").addEventListener("click", () => runSim(10000));
     $("resetBankBtn").addEventListener("click", resetGame);
-    $("overround").addEventListener("change", updateOverround);
+    $("overround").addEventListener("change", () => {
+      const ov = Number($("overround").value);
+      bookOdds = computeBookOdds(ov);
+      updateRaceUI();
+    });
 
-    // Init
+    // --- Init ---
     updateHUD();
     setBetUI();
+    buildCrowd();
     recalc();
     resetGame();
   </script>
